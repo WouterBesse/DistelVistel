@@ -129,25 +129,38 @@ function distelRender() {
   }
   blendMode(BLEND);
   if(zw == 0) {
-    console.log("Blurw", blurw);
+    //console.log("Blurw", blurw);
     background(255, 255, 255, 255);
     stroke(0, 0, 0);
   } else {
-    console.log("Blurz", blurz);
+    //console.log("Blurz", blurz);
     background(0, 0, 0, 255);
     stroke(255, 255, 255);
 
   }
-  angleMode(DEGREES); 
-
-  // rotateX(90);
   
-  strokeWeight(4);
-  rotateY(180 + ((wilk - 1) * 128));
+  let Xinstances = 4;
+  let Yinstances = 2;
+  angleMode(DEGREES); 
+  strokeWeight(2);
+  rotateY(180);
+  scale(0.75);
   emissiveMaterial(255,0,146);
-  //rotateZ(90);
-  scale(4);
-  model(distel);
+  translate((width/Xinstances)*2.5, height/(2*Yinstances));
+  
+  for(var i = 0; i < Xinstances; i += 1){
+    translate((-width/Xinstances), -2*height/(Yinstances));
+    for(var j = 0; j < Yinstances; j += 1){ 
+      //push();
+      translate(0,height/(Yinstances));
+      push();
+      rotateY((wilk - 1) * 512);
+      scale(vol[0]/256);
+      model(distel);
+      pop();
+      //translate(0,-height/(2*Yinstances));
+    }
+  }
 }
 
 function draw() {
