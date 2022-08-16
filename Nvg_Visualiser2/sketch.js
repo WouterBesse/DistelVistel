@@ -223,7 +223,7 @@ function oscReceiver(address,msg) {
     case "/wDistortionAmount":
       wDistortionAmount = msg;
       break;
-    case "wDistortionType":
+    case "/wDistortionType":
       wDistortionType = msg;
       break;
   }
