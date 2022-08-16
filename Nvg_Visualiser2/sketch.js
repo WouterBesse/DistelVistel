@@ -1,25 +1,9 @@
 // Global Vars
 const VERBOSE = true;
-let scene = 1;
+let scene;
+let scenechange = 0;
 let createdCanvas = 0;
-let lightMode; // Bepaald of de achtergrond wit of zwart is
-
-// Waves Vars
-let wColors = [[],[],[]];
-let wColorMode = 0; // 0 = kleur, 1 = monochroom
-let wBlurWhiteMode;
-let wBlurDarkMode;
-let wFrequency;
-let wPhase = 1;
-let wMovementCounter = 1;
-let wFrequencyAmplitude = [1,1,1];
-let wDistortionAmount;
-let wDistortionType = 0;
-
-// Distel Vars
-let distelModel;
-const DISTELXINSTANCES = 4;
-const DISTELYINSTANCES = 2;
+let lightMode; // Bepaalt of de achtergrond wit of zwart is
 
 // Functie om asset bestanden van tevoren in te laden
 function preload() {
@@ -62,14 +46,6 @@ function setup() {
   });
 }
 
-// Creëert een nieuwe canvas voor de scène indien nodig
-function uniqueCanvasCreator(id, engine) {
-  if(createdCanvas != id){
-    createCanvas(windowWidth, windowHeight, engine);
-    createdCanvas = id;
-  }
-}
-
 function waveVerbose() {
   if(VERBOSE){
     console.group("Wave Variables");
@@ -83,6 +59,75 @@ function waveVerbose() {
     console.debug("wDistortionAmount: ", wDistortionAmount);
     console.debug("wDistortionType: ", wDistortionType);
     console.groupEnd();
+  }
+}
+
+// Ontvang de osc messages
+function oscReceiver(address,msg) {
+  //als de variabele address gelijk is aan /y wordt de code tussen de {} uitegevoerd
+  switch(address){
+    case "/wColorMode":
+      wColorMode = msg;
+      break;
+    case "/lightMode":
+      lightMode = msg;
+      break;
+    case "/wBlurDarkMode":
+      wBlurDarkMode = msg;
+      break;
+    case "/wBlurWhiteMode":
+      wBlurWhiteMode = msg;
+      break;
+    case "/ampLo":
+      wFrequencyAmplitude[0] = msg;
+      break;
+    case "/ampMid":
+      wFrequencyAmplitude[1] = msg;
+      break;
+    case "/ampHi":
+      wFrequencyAmplitude[2] = msg;
+      break;
+    case "/wFrequency":
+      wFrequency = msg;
+      break;
+    case "/wMovementCounter":
+      wMovementCounter = msg;
+      break;
+    case "/wDistortionAmount":
+      wDistortionAmount = msg;
+      break;
+    case "/wDistortionType":
+      wDistortionType = msg;
+      break;
+    case "/scene":
+      scene = msg;
+      scenechange = 1;
+      break;
+  }
+}
+
+// Waves Vars
+let wColors = [[],[],[]];
+let wColorMode = 0; // 0 = kleur, 1 = monochroom
+let wBlurWhiteMode;
+let wBlurDarkMode;
+let wFrequency;
+let wPhase = 1;
+let wMovementCounter = 1;
+let wFrequencyAmplitude = [1,1,1];
+let wDistortionAmount;
+let wDistortionType = 0;
+
+// Distel Vars
+let distelModel;
+const DISTELXINSTANCES = 4;
+const DISTELYINSTANCES = 2;
+
+// Creëert een nieuwe canvas voor de scène indien nodig
+function uniqueCanvasCreator(id, engine) {
+  if(createdCanvas != id){
+    createCanvas(windowWidth, windowHeight, engine);
+    createdCanvas = id;
   }
 }
 
@@ -169,7 +214,7 @@ function distelRender() {
       translate(0,height/(DISTELYINSTANCES));
       push();
       rotateY((wDistortionAmount - 1) * 512);
-      scale(wFrequencyAmplitude[0]/256);
+      scale(wFrequencyAmplitude[0]/192);
       model(distelModel);
       pop();
     }
@@ -195,53 +240,21 @@ function textRender(tekst){
 function draw() {
   switch(scene) {
     case 0:
+      if(scenechange){
+        uniqueCanvasCreator(1, P2D);
+        scenechange = 0;
+      }
       waveRender();
       break;
     case 1:
+      if(scenechange){
+        uniqueCanvasCreator(2, WEBGL);
+        scenechange = 0;
+      }
       drawBackground();
       textRender("Distel");
       distelRender();
       break;
   }
 
-}
-
-// Ontvang de osc messages
-function oscReceiver(address,msg) {
-  //als de variabele address gelijk is aan /y wordt de code tussen de {} uitegevoerd
-  switch(address){
-    case "/wColorMode":
-      wColorMode = msg;
-      break;
-    case "/lightMode":
-      lightMode = msg;
-      break;
-    case "/wBlurDarkMode":
-      wBlurDarkMode = msg;
-      break;
-    case "/wBlurWhiteMode":
-      wBlurWhiteMode = msg;
-      break;
-    case "/ampLo":
-      wFrequencyAmplitude[0] = msg;
-      break;
-    case "/ampMid":
-      wFrequencyAmplitude[1] = msg;
-      break;
-    case "/ampHi":
-      wFrequencyAmplitude[2] = msg;
-      break;
-    case "/wFrequency":
-      wFrequency = msg;
-      break;
-    case "/wMovementCounter":
-      wMovementCounter = msg;
-      break;
-    case "/wDistortionAmount":
-      wDistortionAmount = msg;
-      break;
-    case "wDistortionType":
-      wDistortionType = msg;
-      break;
-  }
 }
