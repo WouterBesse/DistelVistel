@@ -1,6 +1,6 @@
 // Global Vars
 const VERBOSE = true;
-let scene = 0;
+let scene = 1;
 let createdCanvas = 0;
 let lightMode; // Bepaald of de achtergrond wit of zwart is
 
@@ -63,9 +63,9 @@ function setup() {
 }
 
 // Creëert een nieuwe canvas voor de scène indien nodig
-function uniqueCanvasCreator(id) {
+function uniqueCanvasCreator(id, engine) {
   if(createdCanvas != id){
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(windowWidth, windowHeight, engine);
     createdCanvas = id;
   }
 }
@@ -89,7 +89,7 @@ function waveVerbose() {
 // Functie voor het renderen van dewaves
 function waveRender() {
   waveVerbose();
-  uniqueCanvasCreator(1);
+  uniqueCanvasCreator(1, P2D);
   blendMode(BLEND);
 
   // Kiezen tussen witte of zwarte achtergrond
@@ -125,7 +125,7 @@ function waveRender() {
 
     // Hier wordt horizontaal voor elke pixel berekend hoe hoog de wave daar moet zijn
     for(var w = -20; w < width + 20; w += 5) {
-      // De algemene formule voor de waves 
+      // De algemene formule voor de waves, in principe een sinusgolf waarvan de hoogte wordt gemoduleerd met een sinusgolf van lagere frequentie
       var h = ampl * sin(w * 0.03 + wPhase * 0.07 + i * TWO_PI / 3) * pow(abs(sin(w * wFrequency + wPhase * 0.02)), 5);
 
       // Dit is een array van 3 "distortion" formules om de waves nog cooler en meer responsive te maken
@@ -138,7 +138,7 @@ function waveRender() {
 }
 
 function distelRender() {
-  uniqueCanvasCreator(2);
+  uniqueCanvasCreator(2, WEBGL);
   angleMode(DEGREES); 
   blendMode(BLEND);
 
@@ -163,9 +163,9 @@ function distelRender() {
   
   for(var i = 0; i < DISTELXINSTANCES; i += 1){
     translate((-width/DISTELXINSTANCES), -2*height/(DISTELYINSTANCES));
-    for(var j = 0; j < distelYInstances; j += 1){ 
+    for(var j = 0; j < DISTELYINSTANCES; j += 1){ 
       //push();
-      translate(0,height/(distelYInstances));
+      translate(0,height/(DISTELYINSTANCES));
       push();
       rotateY((wDistortionAmount - 1) * 512);
       scale(wFrequencyAmplitude[0]/256);
