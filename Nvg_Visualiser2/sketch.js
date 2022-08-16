@@ -1,6 +1,6 @@
 // Global Vars
 const VERBOSE = true;
-let scene = 1;
+let scene = 0;
 let createdCanvas = 0;
 let lightMode; // Bepaald of de achtergrond wit of zwart is
 
@@ -65,6 +65,7 @@ function setup() {
 // Creëert een nieuwe canvas voor de scène indien nodig
 function uniqueCanvasCreator(id, engine) {
   if(createdCanvas != id){
+    if(VERBOSE) console.log("New canvas with engine: ", engine);
     createCanvas(windowWidth, windowHeight, engine);
     createdCanvas = id;
   }
@@ -225,6 +226,9 @@ function oscReceiver(address,msg) {
       break;
     case "/wDistortionType":
       wDistortionType = msg;
+      break;
+    case "/scene":
+      scene = msg;
       break;
   }
 }
