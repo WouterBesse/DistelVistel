@@ -1,44 +1,48 @@
 // Global Vars
-let scene = 1;
+const VERBOSE = true;
+let scene = 0;
 let createdCanvas = 0;
+let lightMode; // Bepaald of de achtergrond wit of zwart is
 
 // Waves Vars
-var colors;
-var zw;
-var monoc;
-let blurw;
-let blurz;
-var ampl;
-var freq;
-var count = 1;
-var tel = 1;
-var ampl = 1;
-var vol = [1,1,1];
-var rndm;
-var wilk;
-var vert;
-var scenetype;
+let wColors = [[],[],[]];
+let wColorMode = 0; // 0 = kleur, 1 = monochroom
+let wBlurWhiteMode;
+let wBlurDarkMode;
+let wFrequency;
+let wPhase = 1;
+let wMovementCounter = 1;
+let wFrequencyAmplitude = [1,1,1];
+let wDistortionAmount;
+let wDistortionType = 0;
 
 // Distel Vars
-let distel;
+let distelModel;
+const DISTELXINSTANCES = 4;
+const DISTELYINSTANCES = 2;
 
+// Functie om asset bestanden van tevoren in te laden
 function preload() {
-  fontRegular = loadFont('LilitaOne-Regular.ttf');
-  distel = loadModel('assets/Distel2.obj', true);
+  // Voor tekst van vroeger, zou hem verwijderen, echter gaan we misschien weer tekst doen dus laat hem nog ff staan
+  // fontRegular = loadFont('LilitaOne-Regular.ttf'); 
+  distelModel = loadModel('assets/Distel2.obj', true);
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  colors = [
-    color(255, 0, 0),
+  // Preset voor de kleuren van de lijnen bij kleur mode en monochroom mode
+  wColors = [
+    [color(255, 0, 0),
     color(0, 255, 0),
-    color(0, 0, 255)
-  ];
+    color(0, 0, 255)]
+    ,
+    [color(255, 255, 255),
+    color(255, 255, 255),
+    color(255, 255, 255)]
+  ]
 
-  type = 1;
-  monoc = 0;
-  smooth();
+  smooth(); // Anti aliasing
 
   //maak een connect-object aan dat zorgt voor de communicatie met oscServer.js
   connect = new Connect();
@@ -58,111 +62,121 @@ function setup() {
   });
 }
 
-function waveRender() {
-  if(createdCanvas != 1){
+// Creëert een nieuwe canvas voor de scène indien nodig
+function uniqueCanvasCreator(id) {
+  if(createdCanvas != id){
     createCanvas(windowWidth, windowHeight);
-    createdCanvas = 1;
+    createdCanvas = id;
   }
+}
+
+function waveVerbose() {
+  if(VERBOSE){
+    console.group("Wave Variables");
+    console.debug("wColorMode: ", wColorMode);
+    console.debug("lightMode: ", lightMode);
+    console.debug("wBlurDarkMode: ", wBlurDarkMode);
+    console.debug("wBlurWhiteMode: ", wBlurWhiteMode);
+    console.debug("wFrequencyAmplitude: ", wFrequencyAmplitude);
+    console.debug("wFrequency: ", wFrequency);
+    console.debug("wMovementCounter: ", wMovementCounter);
+    console.debug("wDistortionAmount: ", wDistortionAmount);
+    console.debug("wDistortionType: ", wDistortionType);
+    console.groupEnd();
+  }
+}
+
+// Functie voor het renderen van dewaves
+function waveRender() {
+  waveVerbose();
+  uniqueCanvasCreator(1);
   blendMode(BLEND);
-    if(monoc == 0) {
-      colors = [
-        color(255, 0, 0),
-        color(0, 255, 0),
-        color(0, 0, 255)
-      ];
-    } else {
-      colors = [
-        color(255, 255, 255),
-        color(255, 255, 255),
-        color(255, 255, 255)
-      ];
-    }
 
-    if(zw == 0) {
-      console.log("Blurw", blurw);
-      background(255, 255, 255, blurw);
+  // Kiezen tussen witte of zwarte achtergrond
+  switch(lightMode){
+    case 0:
+      background(255, 255, 255, wBlurWhiteMode);
       blendMode(EXCLUSION);
-    } else {
-      console.log("Blurz", blurz);
-      background(0, 0, 0, blurz);
+      break;
+    case 1:
+      background(0, 0, 0, wBlurDarkMode);
       blendMode(SCREEN);
+      break;
+  }
+
+  // Aantal properties voor de lines
+  noFill();
+  strokeWeight(20);
+
+  // Dit is de code om de waves horizontaal te laten scrollen
+  // Dit gebeurt door een getal om hoog te tellen
+  // De hoeveelheid dat hij per frame omhoog is geteld wordt omgezet naar de hoeveelheid dat hij scrollt
+  let movementDelta = wMovementCounter - wPhase;
+  wPhase += movementDelta * 0.05;
+
+  // Hier maakt hij 3 waves (i < 3; i++)
+  for(var i = 0; i < 3; i++) {
+    // Deze waves krijgen elk de amplitude van een ander frequentie gebied
+    let ampl = wFrequencyAmplitude[i];
+    // Deze waves krijgen elk een eigen kleur uit de waveColors array
+    stroke(wColors[wColorMode][i]);
+
+    beginShape();
+
+    // Hier wordt horizontaal voor elke pixel berekend hoe hoog de wave daar moet zijn
+    for(var w = -20; w < width + 20; w += 5) {
+      // De algemene formule voor de waves 
+      var h = ampl * sin(w * 0.03 + wPhase * 0.07 + i * TWO_PI / 3) * pow(abs(sin(w * wFrequency + wPhase * 0.02)), 5);
+
+      // Dit is een array van 3 "distortion" formules om de waves nog cooler en meer responsive te maken
+      var waveTypes = [height / 2 + sin(wDistortionAmount * w)*wDistortionAmount*100, height / 2 + sin(w * 0.0015 * TWO_PI * wDistortionAmount)*((500*wDistortionAmount)-500), height / 2 * wDistortionAmount];
+      h += waveTypes[wDistortionType];
+      curveVertex(w, h);
     }
-
-    noFill();
-    strokeWeight(20);
-
-
-
-    let target = tel;
-    let delta = target - count;
-    count += delta * 0.05;
-
-    
-
-    rndm = random(-wilk + 2, wilk);
-    print(rndm);
-
-    for(var i = 0; i < 3; i++) {
-      let ampl = vol[i];
-      //let ampd = amptarg - ampl;
-      //ampl += ampd * 0.05;
-
-      stroke(colors[i]);
-      // print(frameCount);
-      beginShape();
-      for(var w = -20; w < width + 20; w += 5) {
-        var wavtypes = [height / 2 + sin(wilk * w)*wilk*100, height / 2 + sin(w * 0.0015 * TWO_PI * wilk)*((500*wilk)-500), height / 2 * wilk];
-        var h = wavtypes[scenetype];
-        h += ampl * sin(w * 0.03 + count * 0.07 + i * TWO_PI / 3) * pow(abs(sin(w * freq + count * 0.02)), 5);
-
-        curveVertex(w, h);
-      }
-      endShape();
+    endShape();
   }
 }
 
 function distelRender() {
-  blendMode(SCREEN);
-  if(createdCanvas != 2){
-    createCanvas(windowWidth, windowHeight, WEBGL);
-    createdCanvas = 2;
-  }
+  uniqueCanvasCreator(2);
+  angleMode(DEGREES); 
   blendMode(BLEND);
-  if(zw == 0) {
-    //console.log("Blurw", blurw);
-    background(255, 255, 255, 255);
-    stroke(0, 0, 0);
-  } else {
-    //console.log("Blurz", blurz);
-    background(0, 0, 0, 255);
-    stroke(255, 255, 255);
 
+  // Kiezen tussen witte of zwarte achtergrond
+  switch(lightMode){
+    case 0:
+      background(255, 255, 255, 255);
+      stroke(0, 0, 0);
+      break;
+    case 1:
+      background(0, 0, 0, 255);
+      stroke(255, 255, 255);
+      break;
   }
   
-  let Xinstances = 4;
-  let Yinstances = 2;
-  angleMode(DEGREES); 
+  // Distel properties 
   strokeWeight(2);
   rotateY(180);
   scale(0.75);
   emissiveMaterial(255,0,146);
-  translate((width/Xinstances)*2.5, height/(2*Yinstances));
+  translate((width/DISTELXINSTANCES)*2.5, height/(2*DISTELYINSTANCES));
   
-  for(var i = 0; i < Xinstances; i += 1){
-    translate((-width/Xinstances), -2*height/(Yinstances));
-    for(var j = 0; j < Yinstances; j += 1){ 
+  for(var i = 0; i < DISTELXINSTANCES; i += 1){
+    translate((-width/DISTELXINSTANCES), -2*height/(DISTELYINSTANCES));
+    for(var j = 0; j < distelYInstances; j += 1){ 
       //push();
-      translate(0,height/(Yinstances));
+      translate(0,height/(distelYInstances));
       push();
-      rotateY((wilk - 1) * 512);
-      scale(vol[0]/256);
-      model(distel);
+      rotateY((wDistortionAmount - 1) * 512);
+      scale(wFrequencyAmplitude[0]/256);
+      model(distelModel);
       pop();
       //translate(0,-height/(2*Yinstances));
     }
   }
 }
 
+// De functie waarin de frame getekend wordt
 function draw() {
   switch(scene) {
     case 0:
@@ -175,51 +189,42 @@ function draw() {
 
 }
 
+// Ontvang de osc messages
 function oscReceiver(address,msg) {
   //als de variabele address gelijk is aan /y wordt de code tussen de {} uitegevoerd
-  if (address === "/monoch") {
-    monoch = msg;
-    monoc = monoch;
-  }
-  if (address === "/bw") {
-    bw = msg;
-    zw = bw;
-    
-  }
-  if (address === "/blurb"){
-    blurb = msg;
-    blurz = blurb;
-  }
-  if (address === "/blurwh") {
-    blurwh = msg;
-    blurw = blurwh;
-  }
-  if (address === "/ampLo") {
-    amp = msg;
-    vol[0] = amp;
-  }
-  if (address === "/ampMid") {
-    amp = msg;
-    vol[1] = amp;
-  }
-  if (address === "/ampHi") {
-    amp = msg;
-    vol[2] = amp;
-  }
-  if (address === "/freqy") {
-    freqy = msg;
-    freq = freqy;
-  }
-  if (address === "/graaftel") {
-    graaftel = msg;
-    tel = graaftel;
-  }
-  if (address === "/willek") {
-    willek = msg;
-    wilk = willek;
-  }
-  if (address === "/wavtype") {
-    st = msg;
-    scenetype = st;
+  switch(address){
+    case "/wColorMode":
+      wColorMode = msg;
+      break;
+    case "/lightMode":
+      lightMode = msg;
+      break;
+    case "/wBlurDarkMode":
+      wBlurDarkMode = msg;
+      break;
+    case "/wBlurWhiteMode":
+      wBlurWhiteMode = msg;
+      break;
+    case "/ampLo":
+      wFrequencyAmplitude[0] = msg;
+      break;
+    case "/ampMid":
+      wFrequencyAmplitude[1] = msg;
+      break;
+    case "/ampHi":
+      wFrequencyAmplitude[2] = msg;
+      break;
+    case "/wFrequency":
+      wFrequency = msg;
+      break;
+    case "/wMovementCounter":
+      wMovementCounter = msg;
+      break;
+    case "/wDistortionAmount":
+      wDistortionAmount = msg;
+      break;
+    case "wDistortionType":
+      wDistortionType = msg;
+      break;
   }
 }
