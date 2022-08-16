@@ -24,7 +24,7 @@ const DISTELYINSTANCES = 2;
 // Functie om asset bestanden van tevoren in te laden
 function preload() {
   // Voor tekst van vroeger, zou hem verwijderen, echter gaan we misschien weer tekst doen dus laat hem nog ff staan
-  // fontRegular = loadFont('LilitaOne-Regular.ttf'); 
+  fontRegular = loadFont('DDCHardware-Regular.ttf'); 
   distelModel = loadModel('assets/Distel2.obj', true);
 }
 
@@ -137,10 +137,9 @@ function waveRender() {
   }
 }
 
-function distelRender() {
+function drawBackground(){
   uniqueCanvasCreator(2, WEBGL);
-  angleMode(DEGREES); 
-  blendMode(BLEND);
+  blendMode(ADD);
 
   // Kiezen tussen witte of zwarte achtergrond
   switch(lightMode){
@@ -153,27 +152,43 @@ function distelRender() {
       stroke(255, 255, 255);
       break;
   }
-  
+}
+
+function distelRender() {
   // Distel properties 
+  angleMode(DEGREES); 
   strokeWeight(2);
   rotateY(180);
-  scale(0.75);
+  scale(0.55);
   emissiveMaterial(255,0,146);
-  translate((width/DISTELXINSTANCES)*2.5, height/(2*DISTELYINSTANCES));
+  translate((width/DISTELXINSTANCES)*2.5, height/(2*DISTELYINSTANCES), -300);
   
   for(var i = 0; i < DISTELXINSTANCES; i += 1){
     translate((-width/DISTELXINSTANCES), -2*height/(DISTELYINSTANCES));
     for(var j = 0; j < DISTELYINSTANCES; j += 1){ 
-      //push();
       translate(0,height/(DISTELYINSTANCES));
       push();
       rotateY((wDistortionAmount - 1) * 512);
       scale(wFrequencyAmplitude[0]/256);
       model(distelModel);
       pop();
-      //translate(0,-height/(2*Yinstances));
     }
   }
+}
+
+function textRender(tekst){
+  textFont(fontRegular);
+  textAlign(CENTER,CENTER);
+  textSize(width/4);
+  switch(lightMode){
+    case 0:
+      fill(0, 0, 0);
+      break;
+    case 1:
+      fill(255, 255, 255);
+      break;
+  }
+  text(tekst, 0, 0);
 }
 
 // De functie waarin de frame getekend wordt
@@ -183,6 +198,8 @@ function draw() {
       waveRender();
       break;
     case 1:
+      drawBackground();
+      textRender("Distel");
       distelRender();
       break;
   }
