@@ -1,6 +1,6 @@
 // Global Vars
-const VERBOSE = true;
-let scene;
+const VERBOSE = false;
+let scene = 1;
 let scenechange = 0;
 let createdCanvas = 0;
 let lightMode; // Bepaalt of de achtergrond wit of zwart is
@@ -10,6 +10,10 @@ function preload() {
   // Voor tekst van vroeger, zou hem verwijderen, echter gaan we misschien weer tekst doen dus laat hem nog ff staan
   fontRegular = loadFont('DDCHardware-Regular.ttf'); 
   distelModel = loadModel('assets/Distel2.obj', true);
+  buurModel = loadModel('assets/BUUR.obj', true);
+  koshModel = loadModel('assets/KOSH.obj', true);
+  ureModel = loadModel('assets/URE.obj', true);
+  distelRondModel = loadModel('assets/Distel.obj', true);
 }
 
 function setup() {
@@ -120,8 +124,8 @@ let wDistortionType = 0;
 
 // Distel Vars
 let distelModel;
-const DISTELXINSTANCES = 4;
-const DISTELYINSTANCES = 2;
+// const DISTELXINSTANCES = 4;
+// const DISTELYINSTANCES = 2;
 
 // Creëert een nieuwe canvas voor de scène indien nodig
 function uniqueCanvasCreator(id, engine) {
@@ -199,23 +203,31 @@ function drawBackground(){
   }
 }
 
-function distelRender() {
+function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES) {
   // Distel properties 
   angleMode(DEGREES); 
   strokeWeight(2);
   rotateY(180);
-  scale(0.55);
+  scale(0.55); 
   emissiveMaterial(255,0,146);
-  translate((width/DISTELXINSTANCES)*2.5, height/(2*DISTELYINSTANCES), -300);
+  translate((width/DISTELXINSTANCES)*(DISTELXINSTANCES/2+0.5), height/(DISTELYINSTANCES*DISTELYINSTANCES), -300);
   
   for(var i = 0; i < DISTELXINSTANCES; i += 1){
     translate((-width/DISTELXINSTANCES), -2*height/(DISTELYINSTANCES));
     for(var j = 0; j < DISTELYINSTANCES; j += 1){ 
-      translate(0,height/(DISTELYINSTANCES));
+      translate(0, height/(DISTELYINSTANCES));
       push();
-      rotateY((wDistortionAmount - 1) * 512);
-      scale(wFrequencyAmplitude[0]/192);
-      model(distelModel);
+      //rotateY((wDistortionAmount - 1) * 512);
+      switch(distel){
+        case distelModel:
+          scale((wFrequencyAmplitude[0]/192)*2/DISTELYINSTANCES);
+          break;
+        case distelRondModel:
+          rotateZ(millis() / 15);
+          scale(4);
+          break;
+      }
+      model(distel);
       pop();
     }
   }
@@ -236,25 +248,94 @@ function textRender(tekst){
   text(tekst, 0, 0);
 }
 
+function djRender(dj){
+  const blinkThresh = 1.3;
+  uniqueCanvasCreator(2, WEBGL);
+  blendMode(ADD);
+
+  let blink = 0;
+  if(wFrequencyAmplitude[0]/192 > blinkThresh){
+    blink = 0;
+  } else {
+    blink = 1;
+  }
+
+  switch(blink){
+    case 0:
+      background(255, 255, 255, 255);
+      stroke(0, 0, 0);
+      break;
+    case 1:
+      background(0, 0, 0, 255);
+      stroke(255, 255, 255);
+      break;
+  }
+  let constrained = constrain(wFrequencyAmplitude[0]/192, 1 , 2);
+  ortho();
+  angleMode(DEGREES); 
+  strokeWeight(2);
+  rotateX(180);
+  scale(4);
+  scale(constrained, 1);
+  console.log(constrained)
+  emissiveMaterial(255,0,146);
+  model(dj);
+}
+
 // De functie waarin de frame getekend wordt
 function draw() {
   switch(scene) {
-    case 0:
+    case 0: // Waves
       if(scenechange){
         uniqueCanvasCreator(1, P2D);
         scenechange = 0;
       }
       waveRender();
       break;
-    case 1:
+
+    case 1: // Distel
       if(scenechange){
         uniqueCanvasCreator(2, WEBGL);
         scenechange = 0;
       }
       drawBackground();
       textRender("Distel");
-      distelRender();
+      distelRender(distelModel, 4, 2);
       break;
+
+    case 2: // BUUR
+      if(scenechange){
+        uniqueCanvasCreator(2, WEBGL);
+        scenechange = 0;
+      }
+      djRender(buurModel);
+      break; 
+
+    case 3: // KOSH
+      if(scenechange){
+        uniqueCanvasCreator(2, WEBGL);
+        scenechange = 0;
+      }
+      djRender(koshModel);
+      break;
+
+    case 4: // U:RE
+      if(scenechange){
+        uniqueCanvasCreator(2, WEBGL);
+        scenechange = 0;
+      }
+      djRender(ureModel);
+      break; 
+
+    case 5: // Distel rond
+      if(scenechange){
+        uniqueCanvasCreator(2, WEBGL);
+        scenechange = 0;
+      }
+      drawBackground();
+      distelRender(distelRondModel, 1, 1);
+      break; 
+
   }
 
 }
