@@ -225,7 +225,27 @@ function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES) {
       model(distel);
       pop();
     }
+
+  switch(blink){
+    case 0:
+      background(255, 255, 255, 255);
+      stroke(0, 0, 0);
+      break;
+    case 1:
+      background(0, 0, 0, 255);
+      stroke(255, 255, 255);
+      break;
   }
+
+  let constrained = constrain(wFrequencyAmplitude[0]/192, 1 , 2);
+  ortho();
+  angleMode(DEGREES); 
+  strokeWeight(2);
+  rotateX(180);
+  scale(4);
+  scale(constrained, 1);
+  emissiveMaterial(255,0,146);
+  model(dj);
 }
 
 //Render een aangegeven tekst op het scherm
@@ -240,6 +260,7 @@ function textRender(tekst){
     case 1:
       fill(255, 255, 255);
       break;
+
   }
   text(tekst, 0, 0);
 }
