@@ -1,19 +1,18 @@
 // Global Vars
 const VERBOSE = false;
-let scene = 1;
+let scene =0;
 let scenechange = 0;
 let createdCanvas = 0;
 let lightMode; // Bepaalt of de achtergrond wit of zwart is
 
 // Functie om asset bestanden van tevoren in te laden
 function preload() {
-  // Voor tekst van vroeger, zou hem verwijderen, echter gaan we misschien weer tekst doen dus laat hem nog ff staan
   fontRegular = loadFont('DDCHardware-Regular.ttf'); 
   distelModel = loadModel('assets/Distel2.obj', true);
   buurModel = loadModel('assets/BUUR.obj', true);
   koshModel = loadModel('assets/KOSH.obj', true);
   ureModel = loadModel('assets/URE.obj', true);
-  distelRondModel = loadModel('assets/Distel.obj', true);
+  //distelRondModel = loadModel('assets/Distel.obj', true); // <------------------------ Breaks it all :(
 }
 
 function setup() {
@@ -122,11 +121,6 @@ let wFrequencyAmplitude = [1,1,1];
 let wDistortionAmount;
 let wDistortionType = 0;
 
-// Distel Vars
-let distelModel;
-// const DISTELXINSTANCES = 4;
-// const DISTELYINSTANCES = 2;
-
 // Creëert een nieuwe canvas voor de scène indien nodig
 function uniqueCanvasCreator(id, engine) {
   if(createdCanvas != id){
@@ -186,6 +180,7 @@ function waveRender() {
   }
 }
 
+// Tekent de achtergrond
 function drawBackground(){
   uniqueCanvasCreator(2, WEBGL);
   blendMode(ADD);
@@ -233,6 +228,7 @@ function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES) {
   }
 }
 
+//Render een aangegeven tekst op het scherm
 function textRender(tekst){
   textFont(fontRegular);
   textAlign(CENTER,CENTER);
@@ -248,12 +244,13 @@ function textRender(tekst){
   text(tekst, 0, 0);
 }
 
+//Render de naam van de aangegeven DJ op het scherm
 function djRender(dj){
-  const blinkThresh = 1.3;
+  const blinkThresh = 2;
   uniqueCanvasCreator(2, WEBGL);
   blendMode(ADD);
 
-  let blink = 0;
+  let blink = 0; //<--------------------------------- Kan miss beter in max worden gedaan
   if(wFrequencyAmplitude[0]/192 > blinkThresh){
     blink = 0;
   } else {
@@ -270,6 +267,7 @@ function djRender(dj){
       stroke(255, 255, 255);
       break;
   }
+
   let constrained = constrain(wFrequencyAmplitude[0]/192, 1 , 2);
   ortho();
   angleMode(DEGREES); 
@@ -277,7 +275,6 @@ function djRender(dj){
   rotateX(180);
   scale(4);
   scale(constrained, 1);
-  console.log(constrained)
   emissiveMaterial(255,0,146);
   model(dj);
 }
@@ -327,7 +324,7 @@ function draw() {
       djRender(ureModel);
       break; 
 
-    case 5: // Distel rond
+    case 5: // Distel rond <-------------------- Problematisch idk wrm
       if(scenechange){
         uniqueCanvasCreator(2, WEBGL);
         scenechange = 0;
