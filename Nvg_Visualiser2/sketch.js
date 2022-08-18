@@ -1,6 +1,6 @@
 // Global Vars
 const VERBOSE = false;
-let scene =0;
+let scene;
 let scenechange = 0;
 let createdCanvas = 0;
 let lightMode; // Bepaalt of de achtergrond wit of zwart is
@@ -198,7 +198,7 @@ function drawBackground(){
   }
 }
 
-function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES) {
+function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES){
   // Distel properties 
   angleMode(DEGREES); 
   strokeWeight(2);
@@ -225,27 +225,7 @@ function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES) {
       model(distel);
       pop();
     }
-
-  switch(blink){
-    case 0:
-      background(255, 255, 255, 255);
-      stroke(0, 0, 0);
-      break;
-    case 1:
-      background(0, 0, 0, 255);
-      stroke(255, 255, 255);
-      break;
   }
-
-  let constrained = constrain(wFrequencyAmplitude[0]/192, 1 , 2);
-  ortho();
-  angleMode(DEGREES); 
-  strokeWeight(2);
-  rotateX(180);
-  scale(4);
-  scale(constrained, 1);
-  emissiveMaterial(255,0,146);
-  model(dj);
 }
 
 //Render een aangegeven tekst op het scherm
@@ -268,11 +248,12 @@ function textRender(tekst){
 //Render de naam van de aangegeven DJ op het scherm
 function djRender(dj){
   const blinkThresh = 2;
+  const ampThresh = 208;
   uniqueCanvasCreator(2, WEBGL);
   blendMode(ADD);
 
   let blink = 0; //<--------------------------------- Kan miss beter in max worden gedaan
-  if(wFrequencyAmplitude[0]/192 > blinkThresh){
+  if(wFrequencyAmplitude[0]/ampThresh > blinkThresh){
     blink = 0;
   } else {
     blink = 1;
@@ -289,7 +270,7 @@ function djRender(dj){
       break;
   }
 
-  let constrained = constrain(wFrequencyAmplitude[0]/192, 1 , 2);
+  let constrained = constrain(wFrequencyAmplitude[0]/ampThresh, 1 , 2);
   ortho();
   angleMode(DEGREES); 
   strokeWeight(2);
