@@ -205,14 +205,14 @@ function distelRender(distel, DISTELXINSTANCES, DISTELYINSTANCES){
   rotateY(180);
   scale(0.55); 
   emissiveMaterial(255,0,146);
-  translate((width/DISTELXINSTANCES)*(DISTELXINSTANCES/2+0.5), height/(DISTELYINSTANCES*DISTELYINSTANCES), -300);
+  let power = -DISTELYINSTANCES+4;
+  translate((width/DISTELXINSTANCES)*(DISTELXINSTANCES/2+0.5), height/(Math.pow(DISTELYINSTANCES, power)), -300); // <------------ Moet minder beunoplossing worden
   
   for(var i = 0; i < DISTELXINSTANCES; i += 1){
-    translate((-width/DISTELXINSTANCES), -2*height/(DISTELYINSTANCES));
+    translate((-width/DISTELXINSTANCES), -height);
     for(var j = 0; j < DISTELYINSTANCES; j += 1){ 
       translate(0, height/(DISTELYINSTANCES));
       push();
-      //rotateY((wDistortionAmount - 1) * 512);
       switch(distel){
         case distelModel:
           scale((wFrequencyAmplitude[0]/192)*2/DISTELYINSTANCES);
