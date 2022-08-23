@@ -377,8 +377,8 @@ let djSketch = function (p) {
 
 let pharmacySketch = function (p) {
   const CROSSAMOUNT = 2;
-  const CROSSSIZE = 200; // width/height of the cross in pixels
-  let crossArray = [];  
+  const CROSSSIZE = 400; // width/height of the cross in pixels
+  let crossArray = [];
 
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
@@ -438,7 +438,7 @@ let pharmacySketch = function (p) {
     //gemaakt.
     constructor(xPos, yPos, size) {
         p.rectMode(p.CENTER);
-        //met this.x1, this.y1, etc. wordt er een unieke 
+        //met this.x, this.y, etc. wordt er een unieke 
         //variabele gemaakt die alleen voor het object
         //dat wordt gemaakt geldt.
         this.bigSize = size;
@@ -460,12 +460,20 @@ let pharmacySketch = function (p) {
         this.lineGrowSpeed = 0.5;
         this.lineGrowWidth = 0;
 
-        this.lineHeight = Math.sqrt(Math.pow(this.maskSize, 2) / 2); // Make the line height so that the diagonal is not bigger than the size of the mask
         this.lineLayer = createGraphics(this.bigSize, this.bigSize);
+        this.lineHeight = Math.sqrt(Math.pow(this.maskSize, 2) / 2); // Make the line height so that the diagonal is not bigger than the size of the mask
         this.lineWidth = this.lineHeight / 2 / this.lineAmount;
         this.lineX = 0 - this.lineHeight / 2;
         this.xLines = xPos - this.bigSize/2;
         this.yLines = yPos - this.bigSize/2;
+
+        // Circle Variables
+        this.circleAmount = 50;
+        this.circleGrowSpeed = 3;
+        this.circleMargin = size / 2 / this.circleAmount * 5;
+        this.circleGrowth = this.circleAmount * this.circleMargin * -1;
+
+        this.circleLayer = createGraphics(this.bigSize, this.bigSize);
 
         
         
@@ -477,10 +485,10 @@ let pharmacySketch = function (p) {
     // wordt getekend. 
     draw() {
       //this.makeRotateLines();
-      this.makeGrowingLines();
+      //this.makeGrowingLines();
+      this.makeHypnoCircles();
       this.makeCrossMask();
       
-      //p.line(this.x+this.s/2,this.y,this.x+this.s/2,this.y-this.s*3);
     }
 
     makeCrossMask() {
@@ -517,21 +525,16 @@ let pharmacySketch = function (p) {
 
     makeGrowingLines() {
       this.lineLayer.background(0);
-      //this.lineLayer.rectMode(p.CENTER);
       
       this.lineLayer.push();
       this.lineLayer.fill(0, 255, 0);
       this.lineLayer.noStroke();
       this.lineLayer.translate(this.bigSize/2, 0);
 
-      
-      
       for (var s=0; s<this.lineAmount; s = s+1){ 
         let curX = this.lineX + s * this.lineWidth * 2;
         this.lineLayer.rect(curX, 0, this.lineGrowWidth, this.lineHeight);
-      }
-
-      
+      } 
       this.lineLayer.pop();
 
       this.lineGrowWidth += this.lineGrowSpeed;
@@ -540,6 +543,25 @@ let pharmacySketch = function (p) {
       }
       
       p.image(this.lineLayer, this.xLines, this.yLines);
+    }
+
+    makeHypnoCircles() {
+      this.circleLayer.background(0);
+
+      this.circleLayer.push();
+      this.circleLayer.fill(0, 255, 0);
+      this.circleLayer.noStroke();
+      this.circleGrowth += this.circleGrowSpeed;
+
+      for (let i = this.circleAmount; i>0; i += -1) {
+        let diameter =  i * this.circleMargin + this.circleGrowth;
+        if(diameter > 0) {
+          this.circleLayer.fill(0, 255 * (i%2), 0);
+          this.circleLayer.circle(this.bigSize/2, this.bigSize/2, diameter);
+        }
+      }
+
+      p.image(this.circleLayer, this.xLines, this.yLines);
     }
   }
 
