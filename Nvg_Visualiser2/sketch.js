@@ -115,6 +115,12 @@ function oscReceiver(address, msg) {
 }
 
 // All sketch instances
+// Some extra info, each one is kind of it's own p5js instance
+// If you want to use any feature from p5js, put p. before it
+// For example p.color(255), p.blendMode(p.ADD) etc.
+// If you want to make a new function you can do that in the following way:
+// p.functionName = function () {insert function};
+// which you can call like this: p.functionName();
 let waveSketch = function (p) {
   const LINECOLORS = [
     [p.color(255, 0, 0),
@@ -475,6 +481,9 @@ let pharmacySketch = function (p) {
 
         this.circleLayer = createGraphics(this.bigSize, this.bigSize);
 
+        // Flash variables
+        this.flashCounter = 0;
+
         
         
     }
@@ -486,7 +495,8 @@ let pharmacySketch = function (p) {
     draw() {
       //this.makeRotateLines();
       //this.makeGrowingLines();
-      this.makeHypnoCircles();
+      //this.makeHypnoCircles();
+      this.makeFlashes();
       this.makeCrossMask();
       
     }
@@ -562,6 +572,19 @@ let pharmacySketch = function (p) {
       }
 
       p.image(this.circleLayer, this.xLines, this.yLines);
+    }
+
+    makeFlashes() {
+      this.flashCounter += 1;
+      p.push();
+      if(this.flashCounter % 10 < 5) {
+        p.fill(0);
+      } else {
+        p.fill(0, 255, 0);
+      }
+      //p.rectMode(p.CENTER);
+      p.rect(this.x, this.y, this.bigSize, this.bigSize);
+      p.pop();
     }
   }
 
