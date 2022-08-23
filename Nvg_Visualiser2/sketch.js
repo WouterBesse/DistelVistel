@@ -1,12 +1,14 @@
 // Global Vars
 const VERBOSE = false;
 const FRAMERATE = 60;
-let scene = 5;
+let scene = 0;
 let sceneChange = false;
 let createdCanvas = 0;
-let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
+let lightMode; // Bepaalt of de achtergrond wit of zwart is
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
+let wCrossType = 2;
+let crossReset;
 
 let sceneDoms;
 let scenes;
@@ -110,6 +112,9 @@ function oscReceiver(address, msg) {
     case "/scene":
       scene = msg;
       sceneChange = true;
+      break;
+    case "/wCrossType":
+      wCrossType = msg;
       break;
   }
 }
@@ -320,7 +325,7 @@ let djSketch = function (p) {
   }
 
   p.drawBackground = function () {
-    p.blendMode(p.ADD);
+    //p.blendMode(p.ADD);
     p.background(BGCOLORS[lightMode]);
     p.stroke(STROKECOLORS[lightMode]);
   }
@@ -354,7 +359,6 @@ let djSketch = function (p) {
     p.drawBackground();
 
     let constrained = p.constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
-    p.background(0);
     p.ortho();
     p.angleMode(p.DEGREES);
     
@@ -383,8 +387,9 @@ let djSketch = function (p) {
 
 let pharmacySketch = function (p) {
   const CROSSAMOUNT = 2;
-  const CROSSSIZE = 400; // width/height of the cross in pixels
+  const CROSSSIZE = 800/CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
+
 
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
@@ -484,21 +489,48 @@ let pharmacySketch = function (p) {
         // Flash variables
         this.flashCounter = 0;
 
+        this.previousCross = wCrossType;  
+        this.crossReset = false;
+
         
         
     }
     // je kan oneindig veel methods (functies binnen
     // een object) aanmaken in je class-
-    // omschrijving. Deze teken()-method
-    // zorgt ervoor dat een kwart-noot 
-    // wordt getekend. 
+    // omschrijving.
     draw() {
-      //this.makeRotateLines();
-      //this.makeGrowingLines();
-      //this.makeHypnoCircles();
-      this.makeFlashes();
+      this.checkReset();
+      switch(wCrossType){
+        case 0:
+          this.makeRotateLines();
+          this.crossReset = false;
+          break;
+        case 1:
+          this.makeRotateLines();
+          this.crossReset = false;
+          break;
+        case 2:
+          this.makeGrowingLines();
+          this.crossReset = false;
+          break;
+        case 3:
+          this.makeHypnoCircles();
+          this.crossReset = false;
+          break;
+        case 4:
+          this.makeFlashes();
+          this.crossReset = false;
+          break;
+      }
       this.makeCrossMask();
       
+    }
+
+    checkReset(){ 
+      if(wCrossType != this.previousCross){
+        this.crossReset = true;
+      }
+      this.previousCross = wCrossType;
     }
 
     makeCrossMask() {
@@ -561,7 +593,12 @@ let pharmacySketch = function (p) {
       this.circleLayer.push();
       this.circleLayer.fill(0, 255, 0);
       this.circleLayer.noStroke();
-      this.circleGrowth += this.circleGrowSpeed;
+
+      if(this.crossReset){
+        this.circleGrowth = this.circleAmount * this.circleMargin * -1;
+      } else {
+        this.circleGrowth += this.circleGrowSpeed;
+      }
 
       for (let i = this.circleAmount; i>0; i += -1) {
         let diameter =  i * this.circleMargin + this.circleGrowth;
@@ -569,8 +606,9 @@ let pharmacySketch = function (p) {
           this.circleLayer.fill(0, 255 * (i%2), 0);
           this.circleLayer.circle(this.bigSize/2, this.bigSize/2, diameter);
         }
-      }
 
+      }
+      this.circleLayer.pop();
       p.image(this.circleLayer, this.xLines, this.yLines);
     }
 
