@@ -1,16 +1,16 @@
 // Global Vars
 const VERBOSE = false;
 const FRAMERATE = 60;
-let scene = 3;
+let scene = 5;
 let sceneChange = false;
 let createdCanvas = 0;
-let lightMode = 0; // Bepaalt of de achtergrond wit of zwart is
+let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
 let sceneDoms;
 let scenes;
-let sceneAllocations = [0, 1, 2, 2, 2];
+let sceneAllocations = [0, 1, 2, 2, 2, 3];
 
 // Global Waves Vars
 let wColorMode = 0; // 0 = kleur, 1 = monochroom
@@ -26,7 +26,8 @@ function preload() {
   scenes = [ // set Scenes
     new p5(waveSketch),
     new p5(distelSketch),
-    new p5(djSketch)
+    new p5(djSketch),
+    new p5(pharmacySketch)
   ];
   sceneDoms = document.getElementsByClassName("p5Canvas");
 }
@@ -54,7 +55,6 @@ function setup() {
 
 function waveVerbose() {
   const SCENEID = 0;
-
   if (VERBOSE) {
     console.group("Wave Variables");
     console.debug("wColorMode: ", wColorMode);
@@ -308,13 +308,9 @@ let djSketch = function (p) {
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.WEBGL);
     canvas.position(0, 0);
+    textLayer = p.createGraphics(windowWidth, windowHeight, p.P2D)
     p.smooth(); // Anti aliasing
     p.frameRate(FRAMERATE);
-  }
-
-  p.playstate = function () {
-    canvas.hide();
-    p.noLoop();
   }
 
   p.drawBackground = function () {
@@ -333,6 +329,9 @@ let djSketch = function (p) {
 
       case 4: // U:RE
         return(ureModel);
+      
+      default:
+        return(buurModel);
     }
   }
 
@@ -349,17 +348,204 @@ let djSketch = function (p) {
     p.drawBackground();
 
     let constrained = p.constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
+    p.background(0);
     p.ortho();
     p.angleMode(p.DEGREES);
+    
+    
+    
+    p.push();
     p.strokeWeight(2);
     p.rotateX(180);
     p.scale(4);
     p.scale(constrained, 1);
     p.emissiveMaterial(255, 0, 146);
     p.model(dj);
+
+    p.erase();
+    p.rect(300, -windowHeight/2, 55, windowHeight);
+    
+    //p.image(textLayer, -windowWidth/2, -windowHeight/2);
+    p.noErase();
+
+    p.pop();
+    
+
+    
   }
 }
 
+let pharmacySketch = function (p) {
+  const CROSSAMOUNT = 2;
+  const CROSSSIZE = 200; // width/height of the cross in pixels
+  let crossArray = [];  
+
+  p.setup = function () {
+    canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
+    canvas.position(0, 0);
+    //textLayer = p.createGraphics(windowWidth, windowHeight, p.P2D)
+    p.smooth(); // Anti aliasing
+    p.frameRate(FRAMERATE);
+
+    p.pushCrosses();
+  }
+
+  p.pushCrosses = function () {
+    // Calculation to evenly distribute objects along x axis
+    let totalObjectWidth = CROSSAMOUNT * CROSSSIZE;
+    let screenWidth = p.width;
+    let totalMarginSpace = screenWidth - totalObjectWidth;
+    let amountToDisplace = totalMarginSpace/(CROSSAMOUNT+1) + CROSSSIZE;
+    let xPos = -CROSSSIZE/2;
+
+    if(VERBOSE){
+      console.log("totalObjectWidth: ", totalObjectWidth);
+      console.log("screenWidth: ", screenWidth);
+      console.log("totalMarginSpace: ", totalMarginSpace);
+      console.log("amountToDisplace: ", amountToDisplace);
+    }
+
+    for (let i = 0;i < CROSSAMOUNT;i++) {
+      //met de push-functie voeg je een element toe
+      //aan het eind van de array.
+      //
+      //Het nieuwe object dat aangemaakt is vanuit 
+      //de class-omschrijving wordt in de array gezet.
+      //tegelijk wordt de constructor-method uit de
+      //class-omschrijving uitgevoerd.
+      xPos += amountToDisplace;
+      crossArray.push(new Cross(xPos, p.height/2, CROSSSIZE));
+    }
+  }
+
+  p.drawCrosses = function () {
+    for (let i = 0; i < crossArray.length; i++) {
+      //voer de teken-method uit de class-
+      //omschrijving uit.
+      crossArray[i].draw();
+    }
+  }
+
+  p.draw = function () {
+    p.background(0);
+
+    p.drawCrosses();
+  }
+
+  class Cross {
+    //deze constructor-method wordt uitgevoerd zodra er 
+    //een nieuwe object vanuit deze class-omschrijving wordt
+    //gemaakt.
+    constructor(xPos, yPos, size) {
+        p.rectMode(p.CENTER);
+        //met this.x1, this.y1, etc. wordt er een unieke 
+        //variabele gemaakt die alleen voor het object
+        //dat wordt gemaakt geldt.
+        this.bigSize = size;
+        this.smallSize = size/3;
+        this.x = xPos;
+        this.y = yPos;
+
+        // Mask Variables
+        this.maskSize = size * 2;
+        this.maskLayer = createGraphics(this.maskSize, this.maskSize);
+        this.xMask = xPos - this.maskSize / 2;
+        this.yMask = yPos - this.maskSize / 2;
+
+        // Line Variables
+        this.lineAmount = 15;
+        this.lineRotateSpeed = 0.1;
+        this.lineRot = 0;
+
+        this.lineGrowSpeed = 0.5;
+        this.lineGrowWidth = 0;
+
+        this.lineHeight = Math.sqrt(Math.pow(this.maskSize, 2) / 2); // Make the line height so that the diagonal is not bigger than the size of the mask
+        this.lineLayer = createGraphics(this.bigSize, this.bigSize);
+        this.lineWidth = this.lineHeight / 2 / this.lineAmount;
+        this.lineX = 0 - this.lineHeight / 2;
+        this.xLines = xPos - this.bigSize/2;
+        this.yLines = yPos - this.bigSize/2;
+
+        
+        
+    }
+    // je kan oneindig veel methods (functies binnen
+    // een object) aanmaken in je class-
+    // omschrijving. Deze teken()-method
+    // zorgt ervoor dat een kwart-noot 
+    // wordt getekend. 
+    draw() {
+      //this.makeRotateLines();
+      this.makeGrowingLines();
+      this.makeCrossMask();
+      
+      //p.line(this.x+this.s/2,this.y,this.x+this.s/2,this.y-this.s*3);
+    }
+
+    makeCrossMask() {
+      this.maskLayer.background(0);
+      this.maskLayer.rectMode(p.CENTER);
+
+      this.maskLayer.erase();
+      this.maskLayer.rect(this.maskSize/2, this.maskSize/2, this.bigSize, this.smallSize);
+      this.maskLayer.rect(this.maskSize/2, this.maskSize/2, this.smallSize, this.bigSize);
+      this.maskLayer.noErase();
+
+      p.image(this.maskLayer, this.xMask, this.yMask);
+    }
+
+    makeRotateLines() {
+      this.lineLayer.background(0);
+      this.lineLayer.rectMode(p.CENTER);
+      
+      this.lineLayer.push();
+      this.lineLayer.fill(0, 255, 0);
+      this.lineLayer.noStroke();
+      this.lineLayer.translate(this.bigSize/2, this.bigSize/2);
+      this.lineLayer.rotate(this.lineRot+=this.lineRotateSpeed);
+      
+      for (var s=0; s<this.lineAmount; s = s+1){ 
+        let curX = this.lineX + s * this.lineWidth * 2 + this.lineWidth;
+        this.lineLayer.rect(curX, 0, this.lineWidth, this.lineHeight);
+      }
+      
+      this.lineLayer.pop();
+      
+      p.image(this.lineLayer, this.xLines, this.yLines);
+    }
+
+    makeGrowingLines() {
+      this.lineLayer.background(0);
+      //this.lineLayer.rectMode(p.CENTER);
+      
+      this.lineLayer.push();
+      this.lineLayer.fill(0, 255, 0);
+      this.lineLayer.noStroke();
+      this.lineLayer.translate(this.bigSize/2, 0);
+
+      
+      
+      for (var s=0; s<this.lineAmount; s = s+1){ 
+        let curX = this.lineX + s * this.lineWidth * 2;
+        this.lineLayer.rect(curX, 0, this.lineGrowWidth, this.lineHeight);
+      }
+
+      
+      this.lineLayer.pop();
+
+      this.lineGrowWidth += this.lineGrowSpeed;
+      if(this.lineGrowWidth > this.lineWidth * 2 ) {
+        this.lineGrowWidth = 0;
+      }
+      
+      p.image(this.lineLayer, this.xLines, this.yLines);
+    }
+  }
+
+}
+
+// Draw scenes
 function setScene(newScene) {
   for(s = 0; s < scenes.length; s++) {
     switch (s) {
@@ -374,7 +560,10 @@ function setScene(newScene) {
 }
 
 function draw() {
-  if(sceneDoms.length >= 4) {
+  //console.log(sceneDoms.length);
+  if(sceneDoms.length >= 5) {
     setScene(sceneAllocations[scene]);
+  } else {
+    sceneDoms = document.getElementsByClassName("p5Canvas");
   }
 }
