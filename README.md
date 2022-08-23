@@ -19,7 +19,7 @@ We gebruiken deze node-js server in eerste instantie als lokale webserver voor h
 * Dit betekent dat er nu een lokale webserver draait die luistert naar de poort 8001.
 * Je kunt nu in jouw favoriete webbrowser naar localhost:8001 gaat zal er een tijdelijke website verschijnen.
 * Ga nu in de browser naar `localhost:8001/Nvg_visualiser2/` en je zult hier de visualiser zien.
-* Start nu de Max for Live patch op in Ableton of in de standalone Max applicatie.
+* Start nu de Max for Live patch `NVG Knopkes New` op in Ableton of in de standalone Max applicatie.
 * Als je nu geluid in de Max patch stuurt zou hij hier op moeten reageren en hiervan data door moeten sturen naar de visualiser
 * Happy visualising :)
 
