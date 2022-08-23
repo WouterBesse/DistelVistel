@@ -1,7 +1,7 @@
 // Global Vars
 const VERBOSE = false;
 const FRAMERATE = 60;
-let scene = 5;
+let scene = 2;
 let sceneChange = false;
 let createdCanvas = 0;
 let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
@@ -320,7 +320,7 @@ let djSketch = function (p) {
   }
 
   p.drawBackground = function () {
-    p.blendMode(p.ADD);
+    //p.blendMode(p.ADD);
     p.background(BGCOLORS[lightMode]);
     p.stroke(STROKECOLORS[lightMode]);
   }
@@ -354,7 +354,6 @@ let djSketch = function (p) {
     p.drawBackground();
 
     let constrained = p.constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
-    p.background(0);
     p.ortho();
     p.angleMode(p.DEGREES);
     
@@ -385,6 +384,11 @@ let pharmacySketch = function (p) {
   const CROSSAMOUNT = 2;
   const CROSSSIZE = 400; // width/height of the cross in pixels
   let crossArray = [];
+  let fontRegular;
+
+  p.preload = function () {
+    fontRegular = p.loadFont('DDCHardware-Regular.ttf');
+  }
 
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
@@ -394,6 +398,7 @@ let pharmacySketch = function (p) {
     p.frameRate(FRAMERATE);
 
     p.pushCrosses();
+    p.textFont(fontRegular);
   }
 
   p.pushCrosses = function () {
@@ -482,7 +487,18 @@ let pharmacySketch = function (p) {
         this.circleLayer = createGraphics(this.bigSize, this.bigSize);
 
         // Flash variables
-        this.flashCounter = 0;
+        this.counter = 0;
+
+        // Temperature variables
+        this.rawTemp = 0;
+        this.celsius = 0;
+        
+        // The matrix variables
+
+        // Recursieve Kruiskes
+
+        this.recursiveLayer = createGraphics(this.maskSize, this.maskSize);
+
 
         
         
@@ -496,8 +512,10 @@ let pharmacySketch = function (p) {
       //this.makeRotateLines();
       //this.makeGrowingLines();
       //this.makeHypnoCircles();
-      this.makeFlashes();
-      this.makeCrossMask();
+      //this.makeFlashes();
+      //this.makeTemperature()
+      this.makeRecursion();
+      //this.makeCrossMask();
       
     }
 
@@ -575,9 +593,9 @@ let pharmacySketch = function (p) {
     }
 
     makeFlashes() {
-      this.flashCounter += 1;
+      this.counter += 1;
       p.push();
-      if(this.flashCounter % 10 < 5) {
+      if(this.counter % 10 < 5) {
         p.fill(0);
       } else {
         p.fill(0, 255, 0);
@@ -586,8 +604,69 @@ let pharmacySketch = function (p) {
       p.rect(this.x, this.y, this.bigSize, this.bigSize);
       p.pop();
     }
-  }
 
+    convertTemperature(val) {
+      return (val - 273).toFixed(2)
+    }
+
+    fetchTemperature(apik) {
+      //Collect all the information with the help of fetch method
+      //This is the api link from where all the information will be collected
+      
+      fetch('https://api.openweathermap.org/data/2.5/weather?lat=52.4958&lon=4.7750&appid='+apik)
+      .then(res => res.json())
+
+      .then(data => {
+        //Now you need to collect the necessary information with the API link. Now I will collect that information and store it in different constants.
+          this.rawTemp = data['main']['temp']
+      })
+      
+      //Now the condition must be added that what if you do not input anything in the input box.
+      .catch(err => alert(err))
+    }
+
+    makeTemperature() {
+      if(this.counter % 2000 == 0 || this.counter == 0) {
+        this.fetchTemperature("58a31d4f296b89970388c0ca730a6c82");
+        this.celsius = this.convertTemperature(this.rawTemp);
+      }
+
+      p.push();
+      p.fill(0, 255, 0);
+      p.rect(this.x, this.y, this.bigSize, this.bigSize);
+      p.pop();
+
+      p.push();
+      p.fill(255, 0, 0);
+      p.textSize(this.bigSize / 5);
+      p.textAlign(CENTER, CENTER);
+      p.text(this.celsius + " C", this.x, this.y - 10);
+      p.pop();
+      this.counter += 1;
+    }
+
+    makeRecursion() {
+      this.recursiveLayer.background(0);
+      this.recursiveLayer.rectMode(p.CENTER);
+      this.recursiveLayer.noFill();
+      this.recursiveLayer.strokeWeight(this.maskSize/20);
+      this.recursiveLayer.stroke(255);
+
+      beginShape();
+      vertex(this.maskSize/2 + this.smallSize / 2,this.maskSize/2 + this.bigSize / 2) // Top Right
+      vertex(this.maskSize/2 - this.smallSize / 2, this.maskSize/2 + this.bigSize / 2) // Top Left
+      vertex(this.maskSize/2 - this.smallSize/2, this.maskSize/2 + this.smallSize / 2) // Top left corner
+      vertex(this.maskSize/2 - this.bigSize/2, this.)
+      endShape(CLOSE);
+
+      this.recursiveLayer.rect(this.maskSize/2, this.maskSize/2, this.bigSize / 2, this.smallSize / 2);
+      this.recursiveLayer.rect(this.maskSize/2, this.maskSize/2, this.smallSize / 2, this.bigSize / 2);
+
+
+      p.image(this.recursiveLayer, this.xMask, this.yMask);
+    }
+
+  }
 }
 
 // Draw scenes
