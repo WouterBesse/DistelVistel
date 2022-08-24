@@ -40,7 +40,7 @@ let distelSketch = function (p) {
       p.textAlign(p.CENTER, p.CENTER);
       p.textSize(p.width / 4);
       p.fill(TEXTCOLORS[lightMode])
-      p.text(tekst, 0, 0);
+      p.text(tekst, 0, -height/2);
     }
   
     p.drawDistel = function (distel) {
