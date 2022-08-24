@@ -1,7 +1,7 @@
 // Global Vars
 const VERBOSE = false;
 const FRAMERATE = 60;
-let scene = 2;
+let scene = 5;
 let sceneChange = false;
 let createdCanvas = 0;
 let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
@@ -382,7 +382,7 @@ let djSketch = function (p) {
 
 let pharmacySketch = function (p) {
   const CROSSAMOUNT = 2;
-  const CROSSSIZE = 400; // width/height of the cross in pixels
+  const CROSSSIZE = 300; // width/height of the cross in pixels
   let crossArray = [];
   let fontRegular;
 
@@ -496,18 +496,15 @@ let pharmacySketch = function (p) {
         // The matrix variables
 
         // Recursieve Kruiskes
-
         this.recursiveLayer = createGraphics(this.maskSize, this.maskSize);
-
-
-        
-        
+        this.recursiveAmount = 1
+        this.crossOutlines = [];
+        this.crossOutlineWidth = size/100*3;
+        this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
     }
     // je kan oneindig veel methods (functies binnen
     // een object) aanmaken in je class-
-    // omschrijving. Deze teken()-method
-    // zorgt ervoor dat een kwart-noot 
-    // wordt getekend. 
+    // omschrijving.
     draw() {
       //this.makeRotateLines();
       //this.makeGrowingLines();
@@ -515,7 +512,7 @@ let pharmacySketch = function (p) {
       //this.makeFlashes();
       //this.makeTemperature()
       this.makeRecursion();
-      //this.makeCrossMask();
+      this.makeCrossMask();
       
     }
 
@@ -646,26 +643,68 @@ let pharmacySketch = function (p) {
     }
 
     makeRecursion() {
-      this.recursiveLayer.background(0);
-      this.recursiveLayer.rectMode(p.CENTER);
-      this.recursiveLayer.noFill();
-      this.recursiveLayer.strokeWeight(this.maskSize/20);
-      this.recursiveLayer.stroke(255);
+      this.counter += 1;
+      for (let i=0;i<this.crossOutlines.length;i++) {
+        this.crossOutlines[i].draw(-0.03, 0, 0, 7);
+      }
+      if(this.counter%10 == 0) {
+        this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
+      }
 
-      beginShape();
-      vertex(this.maskSize/2 + this.smallSize / 2,this.maskSize/2 + this.bigSize / 2) // Top Right
-      vertex(this.maskSize/2 - this.smallSize / 2, this.maskSize/2 + this.bigSize / 2) // Top Left
-      vertex(this.maskSize/2 - this.smallSize/2, this.maskSize/2 + this.smallSize / 2) // Top left corner
-      vertex(this.maskSize/2 - this.bigSize/2, this.)
-      endShape(CLOSE);
-
-      this.recursiveLayer.rect(this.maskSize/2, this.maskSize/2, this.bigSize / 2, this.smallSize / 2);
-      this.recursiveLayer.rect(this.maskSize/2, this.maskSize/2, this.smallSize / 2, this.bigSize / 2);
-
-
-      p.image(this.recursiveLayer, this.xMask, this.yMask);
+      if(this.crossOutlines[0].getColor() > 230) {
+        this.crossOutlines.shift();
+      }
     }
 
+
+  }
+
+  class crossOutline {
+    constructor(posX, posY, bigSize, smallSize, stroke) {
+        this.x = posX;
+        this.y = posY;
+        this.bigSize = bigSize;
+        this.smallSize = smallSize;
+        this.scale = 1;
+        this.color = 0;
+        this.stroke = stroke;
+    }
+
+    draw(scale, transX, transY, colour) {
+      p.push();
+      p.noFill();
+      p.strokeWeight(this.stroke);
+
+      this.color += colour;
+      p.stroke(this.color, 255, this.color);
+
+      this.x += transX;
+      this.y += transY;
+      p.translate(this.x, this.y);
+
+      this.scale += scale;
+      p.scale(this.scale);
+      
+      p.beginShape();
+      p.vertex(this.smallSize / 2, -this.bigSize / 2) // Top Right
+      p.vertex(-this.smallSize / 2, -this.bigSize / 2) // Top Left
+      p.vertex(-this.smallSize/2, -this.smallSize / 2) // Top left corner
+      p.vertex(-this.bigSize/2, -this.smallSize / 2) // Left top
+      p.vertex(-this.bigSize/2, this.smallSize / 2) // Left bot
+      p.vertex(-this.smallSize/2, this.smallSize / 2) // Bot left corner
+      p.vertex(-this.smallSize / 2, this.bigSize / 2) // Bot Left
+      p.vertex(this.smallSize / 2, this.bigSize / 2) // Bot Left
+      p.vertex(this.smallSize/2, this.smallSize / 2) // Bot right corner
+      p.vertex(this.bigSize/2, this.smallSize / 2) // Right bot
+      p.vertex(this.bigSize/2, -this.smallSize / 2) // Right top
+      p.vertex(this.smallSize/2, -this.smallSize / 2) // Top right corner
+      p.endShape(CLOSE);
+      p.pop();
+    }
+
+    getColor() {
+      return(this.color);
+    }
   }
 }
 
@@ -684,7 +723,6 @@ function setScene(newScene) {
 }
 
 function draw() {
-  //console.log(sceneDoms.length);
   if(sceneDoms.length >= 5) {
     setScene(sceneAllocations[scene]);
   } else {
