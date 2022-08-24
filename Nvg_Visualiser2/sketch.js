@@ -1,18 +1,21 @@
 // Global Vars
+const NUMOFSCENES = 5;
 const VERBOSE = false;
 const FRAMERATE = 60;
-let scene = 0;
+const windowWidth = window.innerWidth;
+const windowHeight = window.innerHeight;
+
+let scene = 6;
 let sceneChange = false;
 let createdCanvas = 0;
 let lightMode; // Bepaalt of de achtergrond wit of zwart is
-const windowWidth = window.innerWidth;
-const windowHeight = window.innerHeight;
+
 let wCrossType = 2;
 let crossReset;
 
 let sceneDoms;
 let scenes;
-let sceneAllocations = [0, 1, 2, 2, 2, 3];
+let sceneAllocations = [0, 1, 2, 2, 2, 3, 4];
 
 // Global Waves Vars
 let wColorMode = 0; // 0 = kleur, 1 = monochroom
@@ -29,7 +32,8 @@ function preload() {
     new p5(waveSketch),
     new p5(distelSketch),
     new p5(djSketch),
-    new p5(pharmacySketch)
+    new p5(pharmacySketch),
+    new p5(terrainSketch)
   ];
   sceneDoms = document.getElementsByClassName("p5Canvas");
 }
@@ -628,6 +632,79 @@ let pharmacySketch = function (p) {
 
 }
 
+let terrainSketch = function (p) {
+  var cols, rows;
+  var scl = 30;
+  var w = windowWidth;
+  var h = windowHeight;
+
+  var flying = 0;
+
+  var terrain = [];
+
+  p.setup = function () {
+    let canvas = p.createCanvas(windowWidth, windowHeight, p.WEBGL);
+    canvas.position(0, 0);
+    p.smooth(); // Anti aliasing
+    p.frameRate(FRAMERATE);
+    cols = w / scl;
+    rows = h / scl;
+    for (var x = 0; x < cols; x++) {
+      terrain[x] = [];
+      for (var y = 0; y < rows; y++) {
+        terrain[x][y] = 0; //specify a default value for now
+      }
+    }
+  }
+
+  p.drawBackground = function () {
+    p.blendMode(p.BLEND);
+
+    // Kiezen tussen witte of zwarte achtergrond
+    switch (lightMode) {
+      case 0:
+        p.background(255, 255, 255, wBlurWhiteMode);
+        p.blendMode(p.EXCLUSION);
+        p.stroke(0,0,0);
+        break;
+      case 1:
+        p.background(0, 0, 0, wBlurDarkMode);
+        p.blendMode(p.SCREEN);
+        p.stroke(255,255,255);
+        break;
+    }
+  }
+
+  p.draw = function(){
+    p.background(0,0,0);
+    p.stroke(255,255,255);
+    flying -= 0.2;
+    var yoff = flying;
+    for (var y = 0; y < rows; y++) {
+      var xoff = 0;
+      for (var x = 0; x < cols; x++) {
+        terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -100, 100);
+        xoff += 0.2;
+      }
+      yoff += 0.2;
+    }
+
+    p.translate(0, 50);
+    p.rotateX(PI / 3);
+    p.fill(0, 0, 0);
+    p.translate(-w / 2, -h / 2);
+    for (var y = 0; y < rows - 1; y++) {
+      p.beginShape(TRIANGLE_STRIP);
+      for (var x = 0; x < cols; x++) {
+        p.vertex(x * scl, y * scl, terrain[x][y]);
+        p.vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+      }
+      p.endShape();
+    }
+  }
+
+}
+
 // Draw scenes
 function setScene(newScene) {
   for(s = 0; s < scenes.length; s++) {
@@ -644,7 +721,7 @@ function setScene(newScene) {
 
 function draw() {
   //console.log(sceneDoms.length);
-  if(sceneDoms.length >= 5) {
+  if(sceneDoms.length >= NUMOFSCENES+1) {
     setScene(sceneAllocations[scene]);
   } else {
     sceneDoms = document.getElementsByClassName("p5Canvas");
