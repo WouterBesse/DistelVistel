@@ -24,6 +24,8 @@ let wFrequencyAmplitude = [1, 1, 1];
 let wDistortionAmount;
 let wDistortionType = 0;
 let wCrossType = 0;
+let wShapeType = 0;
+let wMaterial = 0;
 
 function preload() {
   scenes = [ // set Scenes
@@ -119,6 +121,12 @@ function oscReceiver(address, msg) {
       break;
     case "/wCrossType":
       wCrossType = msg;
+      break;
+    case "/wShapeType":
+      wShapeType = msg;
+      break;
+    case "/wMaterial":
+      wMaterial = msg;
       break;
   }
 }
