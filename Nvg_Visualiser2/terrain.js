@@ -1,8 +1,8 @@
 let terrainSketch = function (p) {
   var cols, rows;
   var scl = 50;
-  var w = 2 * windowWidth;
-  var h = 2 * windowHeight;
+  var w = 1.8 * windowWidth;
+  var h = 1.2 * windowHeight;
   var flying = 0;
   var terrain = [];
 
@@ -40,6 +40,7 @@ let terrainSketch = function (p) {
   }
 
   p.draw = function () {
+    p.push();
     p.background(0, 0, 0);
     p.stroke(255, 255, 255);
     p.rotateX(PI / 3);
@@ -47,18 +48,18 @@ let terrainSketch = function (p) {
     p.translate(-w / 2, -h / 2);
 
     flying -= 0.1;
-    amplitude = p.map(wFrequencyAmplitude[0] / 3, 0, 1, -1, 0.8);
+    amplitude = p.map(wFrequencyAmplitude[0] / 3, 0, 1, -1, 1);
     var yoff = flying;
 
-    if (!lightMode) {
-      let rot = 0;
-      for (var i = 0; i < HALF_PI; i += 0.01) {
-        rot += i;
-        p.rotateY(rot);
+    // if (!lightMode) {
+    //   let rot = 0;
+    //   for (var i = 0; i < HALF_PI; i += 0.01) {
+    //     rot += i;
+    //     p.rotateY(rot);
 
-      }
-      rot = 0;
-    }
+    //   }
+    //   rot = 0;
+    // }
 
     for (var y = 0; y < rows; y++) {
       var xoff = p.map(wFrequencyAmplitude[1], 0, 1, -0.01, 0.01);
@@ -77,6 +78,8 @@ let terrainSketch = function (p) {
       }
       p.endShape();
     }
+    p.pop();
+
 
     /*********************************************************************** */
     /*************  UNCOMMENT BELOW TO TRY ADDING GLITCH AGAIN ************* */

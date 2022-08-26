@@ -1,18 +1,18 @@
 // Global Vars
-const NUMOFSCENES = 6;
+const NUMOFSCENES = 7;
 const VERBOSE = false;
 const FRAMERATE = 60;
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-let scene = 7;
+let scene = 8;
 let sceneChange = false;
 let createdCanvas = 0;
-let lightMode; // Bepaalt of de achtergrond wit of zwart is
+let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
 
 let sceneDoms;
 let scenes;
-let sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5];
+let sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6];
 
 // Global Waves Vars
 let wColorMode = 0; // 0 = kleur, 1 = monochroom
@@ -23,6 +23,7 @@ let wMovementCounter = 1;
 let wFrequencyAmplitude = [1, 1, 1];
 let wDistortionAmount;
 let wDistortionType = 0;
+let wCrossType = 0;
 
 function preload() {
   scenes = [ // set Scenes
@@ -31,7 +32,8 @@ function preload() {
     new p5(djSketch),
     new p5(pharmacySketch),
     new p5(terrainSketch),
-    new p5(vinylSketch)
+    new p5(vinylSketch),
+    new p5(shapeSketch)
   ];
   sceneDoms = document.getElementsByClassName("p5Canvas");
 }

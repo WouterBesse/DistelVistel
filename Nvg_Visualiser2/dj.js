@@ -47,21 +47,11 @@ let djSketch = function (p) {
 
   p.draw = function () {
     let dj = p.chooseDJ();
-
-    let blink = 0; //<--------------------------------- Kan miss beter in max worden gedaan // Ja, maar ik laat het voor nu ff in javascript
-    if (wFrequencyAmplitude[0] / AMPTHRESH > BLINKTHRESH) {
-      blink = 0;
-    } else {
-      blink = 1;
-    }
-
     p.drawBackground();
 
     let constrained = p.constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
     p.ortho();
     p.angleMode(p.DEGREES);
-
-
 
     p.push();
     p.strokeWeight(2);
@@ -70,16 +60,6 @@ let djSketch = function (p) {
     p.scale(constrained, 1);
     p.emissiveMaterial(255, 0, 146);
     p.model(dj);
-
-    p.erase();
-    p.rect(300, -windowHeight / 2, 55, windowHeight);
-
-    //p.image(textLayer, -windowWidth/2, -windowHeight/2);
-    p.noErase();
-
     p.pop();
-
-
-
   }
 }
