@@ -1,19 +1,9 @@
 let distelSketch = function (p) {
+  const black = color(0, 0, 0);
+  const white = color(255, 255, 255);
   const SCENEID = 1;
   const DISTELXINSTANCES = 4;
   const DISTELYINSTANCES = 2;
-  const TEXTCOLORS = [
-    p.color(0, 0, 0),
-    p.color(255, 255, 255)
-  ];
-  const BGCOLORS = [
-    p.color(255, 255, 255),
-    p.color(0, 0, 0)
-  ];
-  const STROKECOLORS = [
-    p.color(0, 0, 0),
-    p.color(255, 255, 255)
-  ];
   let power = -DISTELYINSTANCES + 4;
 
   p.preload = function () {
@@ -31,15 +21,24 @@ let distelSketch = function (p) {
 
   p.drawBackground = function () {
     p.blendMode(p.ADD);
-    p.background(BGCOLORS[lightMode]);
-    p.stroke(STROKECOLORS[lightMode]);
+    if (lightMode) {
+      p.background(black);
+      p.stroke(white);
+    } else {
+      p.background(white);
+      p.stroke(black);
+    }
   }
 
   p.textRender = function (tekst) {
     p.textFont(fontRegular);
     p.textAlign(p.CENTER, p.CENTER);
     p.textSize(p.width / 4);
-    p.fill(TEXTCOLORS[lightMode])
+    if (lightMode) {
+      p.fill(white);
+    } else {
+      p.fill(black);
+    }
     p.text(tekst, 0, -height / 2);
   }
 

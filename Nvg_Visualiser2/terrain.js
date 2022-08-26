@@ -3,9 +3,7 @@ let terrainSketch = function (p) {
   var scl = 50;
   var w = 2 * windowWidth;
   var h = 2 * windowHeight;
-
   var flying = 0;
-
   var terrain = [];
 
   p.setup = function () {
@@ -42,22 +40,16 @@ let terrainSketch = function (p) {
   }
 
   p.draw = function () {
-    ampl = wFrequencyAmplitude[0];
     p.background(0, 0, 0);
     p.stroke(255, 255, 255);
-    flying -= 0.1;
-    amplitude = p.map(ampl, 0, 1, -1, 0.8);
-    var yoff = flying;
-    for (var y = 0; y < rows; y++) {
-      var xoff = p.map(wFrequencyAmplitude[1], 0, 1, -0.01, 0.01);
-      for (var x = 0; x < cols; x++) {
-        terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -amplitude, amplitude);
-        xoff += 0.2;
-      }
-      yoff += 0.2;
-    }
+    p.rotateX(PI / 3);
+    p.fill(0, 0, 0);
+    p.translate(-w / 2, -h / 2);
 
-    //p.translate(0, 50);
+    flying -= 0.1;
+    amplitude = p.map(wFrequencyAmplitude[0] / 3, 0, 1, -1, 0.8);
+    var yoff = flying;
+
     if (!lightMode) {
       let rot = 0;
       for (var i = 0; i < HALF_PI; i += 0.01) {
@@ -67,9 +59,16 @@ let terrainSketch = function (p) {
       }
       rot = 0;
     }
-    p.rotateX(PI / 3);
-    p.fill(0, 0, 0);
-    p.translate(-w / 2, -h / 2);
+
+    for (var y = 0; y < rows; y++) {
+      var xoff = p.map(wFrequencyAmplitude[1], 0, 1, -0.01, 0.01);
+      for (var x = 0; x < cols; x++) {
+        terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -amplitude, amplitude);
+        xoff += 0.2;
+      }
+      yoff += 0.2;
+    }
+
     for (var y = 0; y < rows - 1; y++) {
       p.beginShape(TRIANGLE_STRIP);
       for (var x = 0; x < cols; x++) {

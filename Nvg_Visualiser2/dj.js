@@ -1,14 +1,8 @@
 let djSketch = function (p) {
+  const black = color(0, 0, 0);
+  const white = color(255, 255, 255);
   const BLINKTHRESH = 2;
   const AMPTHRESH = 208;
-  const BGCOLORS = [
-    p.color(255, 255, 255),
-    p.color(0, 0, 0)
-  ];
-  const STROKECOLORS = [
-    p.color(0, 0, 0),
-    p.color(255, 255, 255)
-  ];
   let canvas;
 
   p.preload = function () {
@@ -26,9 +20,13 @@ let djSketch = function (p) {
   }
 
   p.drawBackground = function () {
-    //p.blendMode(p.ADD);
-    p.background(BGCOLORS[lightMode]);
-    p.stroke(STROKECOLORS[lightMode]);
+    if (lightMode) {
+      p.background(black);
+      p.stroke(white);
+    } else {
+      p.background(white);
+      p.stroke(black);
+    }
   }
 
   p.chooseDJ = function () {

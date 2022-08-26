@@ -43,7 +43,7 @@ function setup() {
   connect = new Connect();
 
   //maak verbinding met oscServer.js, en voor code tussen {} uit zodra deze verbinding tot stand is gekomen.
-  connect.connectToServer(function() {
+  connect.connectToServer(function () {
     //maak een nieuw server-object aan.
     server = new Server();
 
@@ -51,8 +51,8 @@ function setup() {
     server.startServer(7000);
 
     //als de server een bericht ontvangt voert deze de functie oscReceiver uit en geeft deze twee argumenten mee: address en msg.
-    server.getMessage(function(address,msg) {
-      oscReceiver(address,msg);
+    server.getMessage(function (address, msg) {
+      oscReceiver(address, msg);
     });
   });
 }
@@ -123,7 +123,7 @@ function oscReceiver(address, msg) {
 
 // Draw scenes
 function setScene(newScene) {
-  for(s = 0; s < scenes.length; s++) {
+  for (s = 0; s < scenes.length; s++) {
     switch (s) {
       case newScene:
         scenes[s].loop();
@@ -137,7 +137,7 @@ function setScene(newScene) {
 
 function draw() {
   //console.log(sceneDoms.length);
-  if(sceneDoms.length >= NUMOFSCENES+1) {
+  if (sceneDoms.length >= NUMOFSCENES + 1) {
     setScene(sceneAllocations[scene]);
   } else {
     sceneDoms = document.getElementsByClassName("p5Canvas");
