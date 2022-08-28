@@ -385,9 +385,11 @@ let pharmacySketch = function (p) {
   const CROSSSIZE = 300; // width/height of the cross in pixels
   let crossArray = [];
   let fontRegular;
+  let snakeModel;
 
   p.preload = function () {
     fontRegular = p.loadFont('DDCHardware-Regular.ttf');
+    snakeModel = p.loadModel('assets/Spiraal.obj', true);
   }
 
   p.setup = function () {
@@ -501,6 +503,13 @@ let pharmacySketch = function (p) {
         this.crossOutlines = [];
         this.crossOutlineWidth = size/100*3;
         this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
+
+        // Snake variables
+        this.snakeLayer = createGraphics(this.maskSize, this.maskSize, p.WEBGL);
+        this.snakeLayer.smooth();
+        
+        
+
     }
     // je kan oneindig veel methods (functies binnen
     // een object) aanmaken in je class-
@@ -511,7 +520,8 @@ let pharmacySketch = function (p) {
       //this.makeHypnoCircles();
       //this.makeFlashes();
       //this.makeTemperature()
-      this.makeRecursion();
+      //this.makeRecursion();
+      this.makeSnakes();
       this.makeCrossMask();
       
     }
@@ -654,6 +664,41 @@ let pharmacySketch = function (p) {
       if(this.crossOutlines[0].getColor() > 230) {
         this.crossOutlines.shift();
       }
+    }
+
+    makeSnakes() {
+      p.push();
+      if(this.counter % 20 < 10) {
+        p.fill(0);
+      } else {
+        p.fill(255, 255, 255);
+      }
+      //p.rectMode(p.CENTER);
+      p.rect(this.x, this.y, this.bigSize, this.bigSize);
+      p.pop();
+
+
+      this.counter += 1;
+      this.snakeLayer.background(0);
+      this.snakeLayer.push();
+      this.snakeLayer.rotateY(5 * this.counter);
+      
+      
+      //this.snakeLayer.blendMode(p.ADD);
+      this.snakeLayer.angleMode(p.DEGREES);
+      
+      this.snakeLayer.rotateX(180);
+      
+      this.snakeLayer.scale(1.5);
+
+      this.snakeLayer.clear();
+      this.snakeLayer.stroke(0, 255, 0);
+      this.snakeLayer.fill(0, 255, 0);
+      this.snakeLayer.model(snakeModel);
+      
+
+      p.image(this.snakeLayer, this.xMask, this.yMask);
+      this.snakeLayer.pop();
     }
 
 
