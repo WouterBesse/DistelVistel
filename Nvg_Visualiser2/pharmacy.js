@@ -2,17 +2,23 @@ let pharmacySketch = function (p) {
   const CROSSAMOUNT = 2;
   const CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
-  let crossReset;
+  let fontRegular;
+  let snakeModel;
 
+  p.preload = function () {
+    fontRegular = p.loadFont('DDCHardware-Regular.ttf');
+    snakeModel = p.loadModel('assets/Spiraal.obj', true);
+  }
 
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
     canvas.position(0, 0);
-    //textLayer = p.createGraphics(windowWidth, windowHeight, p.P2D)
+
     p.smooth(); // Anti aliasing
     p.frameRate(FRAMERATE);
 
     p.pushCrosses();
+    p.textFont(fontRegular);
   }
 
   p.pushCrosses = function () {
@@ -31,13 +37,6 @@ let pharmacySketch = function (p) {
     }
 
     for (let i = 0; i < CROSSAMOUNT; i++) {
-      //met de push-functie voeg je een element toe
-      //aan het eind van de array.
-      //
-      //Het nieuwe object dat aangemaakt is vanuit 
-      //de class-omschrijving wordt in de array gezet.
-      //tegelijk wordt de constructor-method uit de
-      //class-omschrijving uitgevoerd.
       xPos += amountToDisplace;
       crossArray.push(new Cross(xPos, p.height / 2, CROSSSIZE));
     }
@@ -53,7 +52,6 @@ let pharmacySketch = function (p) {
 
   p.draw = function () {
     p.background(0);
-
     p.drawCrosses();
   }
 
