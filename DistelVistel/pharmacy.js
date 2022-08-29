@@ -108,7 +108,7 @@ let pharmacySketch = function (p) {
 
       // Temperature variables
       this.rawTemp = 0;
-      this.celsius = 0;
+      this.celsius = 0.0;
       
       // The matrix variables
 
@@ -156,6 +156,10 @@ let pharmacySketch = function (p) {
           break;
         case 6:
           this.makeSnakes();
+          this.crossReset = false;
+          break;
+        case 7:
+          this.makeFarmacia();
           this.crossReset = false;
           break;
       }
@@ -235,9 +239,13 @@ let pharmacySketch = function (p) {
     drawCircles() {
       for (let i = this.circleAmount; i > 0; i += -1) {
         let diameter = i * this.circleMargin + this.circleGrowth;
+        console.log(diameter);
         if (diameter > 0) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
+        }
+        if (diameter > 300){
+          this.crossReset = TRUE;
         }
       }
     }
@@ -270,31 +278,9 @@ let pharmacySketch = function (p) {
       p.pop();
     }
 
-    convertTemperature(val) {
-      return (val - 273).toFixed(2)
-    }
-
-    fetchTemperature(apik) {
-      //Collect all the information with the help of fetch method
-      //This is the api link from where all the information will be collected
-      
-      fetch('https://api.openweathermap.org/data/2.5/weather?lat=52.4958&lon=4.7750&appid='+apik)
-      .then(res => res.json())
-
-      .then(data => {
-        //Now you need to collect the necessary information with the API link. Now I will collect that information and store it in different constants.
-          this.rawTemp = data['main']['temp']
-      })
-      
-      //Now the condition must be added that what if you do not input anything in the input box.
-      .catch(err => alert(err))
-    }
-
     makeTemperature() {
-      if(this.counter % 2000 == 0 || this.counter == 0) {
-        this.fetchTemperature("58a31d4f296b89970388c0ca730a6c82");
-        this.celsius = this.convertTemperature(this.rawTemp);
-      }
+      this.celsius = wTemp;
+      //console.log (this.celsius.toFixed(2));
 
       p.push();
       p.fill(0, 255, 0);
@@ -305,7 +291,7 @@ let pharmacySketch = function (p) {
       p.fill(255, 0, 0);
       p.textSize(this.bigSize / 5);
       p.textAlign(CENTER, CENTER);
-      p.text(this.celsius + " C", this.x, this.y - 10);
+      p.text(this.celsius.toFixed(2) + " C", this.x, this.y - 10);
       p.pop();
       this.counter += 1;
     }
@@ -326,16 +312,14 @@ let pharmacySketch = function (p) {
     }
 
     makeSnakes() {
-      this.makeFlashes(p.color(255, 0, 255));
-
-      this.counter += 1;
+      this.makeFlashes(p.color(255, 0, 146));
 
       //this.snakeLayer.background(0);
       this.snakeLayer.angleMode(p.DEGREES);
       this.snakeLayer.push();
       this.snakeLayer.rotateY(5 * this.counter);
       this.snakeLayer.rotateX(180);
-      this.snakeLayer.scale(2.5);
+      this.snakeLayer.scale(2.0);
 
       this.snakeLayer.clear();
       this.snakeLayer.stroke(0, 255, 0);
@@ -345,6 +329,21 @@ let pharmacySketch = function (p) {
 
       p.image(this.snakeLayer, this.xMask, this.yMask);
       this.snakeLayer.pop();
+    }
+
+    makeFarmacia() {
+      p.push();
+      p.fill(0, 255, 0);
+      p.rect(this.x, this.y, this.bigSize, this.bigSize);
+      p.pop();
+
+      p.push();
+      p.fill(255, 0, 0);
+      p.textSize(this.bigSize / 5);
+      p.textAlign(CENTER, CENTER);
+      p.text("Farmacia Distel", this.x, this.y - 10);
+      p.pop();
+      this.counter += 1;
     }
   }
 
