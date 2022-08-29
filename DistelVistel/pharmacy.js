@@ -1,5 +1,5 @@
 let pharmacySketch = function (p) {
-  const CROSSAMOUNT = 2;
+  const CROSSAMOUNT = 1;
   const CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
   let fontRegular;
@@ -107,8 +107,9 @@ let pharmacySketch = function (p) {
       this.counter = 0;
 
       // Temperature variables
+      p.textSize(this.bigSize / 5);
       this.rawTemp = 0;
-      this.celsius = 0;
+      this.celsius = 0.0;
       
       // The matrix variables
 
@@ -124,11 +125,20 @@ let pharmacySketch = function (p) {
       this.snakeLayer = createGraphics(this.maskSize, this.maskSize, p.WEBGL);
       
       this.snakeLayer.smooth();
+
+      // Farmacia Variables
+      this.farmLayer = createGraphics(this.bigSize, this.bigSize);
+      this.xSpeed = 5
+      this.xStart = 0;
+      p.textAlign(CENTER, CENTER);
+      this.farmLayer.textSize(this.bigSize /5);
+      this.scrollSize = this.bigSize * 2;
+      this.textSize = this.bigSize/5;
+      this.farmLayer.textFont(fontRegular);
     }
 
     draw() {
       this.checkReset();
-      console.log(wCrossType);
       switch (wCrossType) {
         case 0:
           this.makeFlashes();
@@ -156,6 +166,10 @@ let pharmacySketch = function (p) {
           break;
         case 6:
           this.makeSnakes();
+          this.crossReset = false;
+          break;
+        case 7:
+          this.makeFarmacia();
           this.crossReset = false;
           break;
       }
@@ -235,9 +249,13 @@ let pharmacySketch = function (p) {
     drawCircles() {
       for (let i = this.circleAmount; i > 0; i += -1) {
         let diameter = i * this.circleMargin + this.circleGrowth;
+        console.log(diameter);
         if (diameter > 0) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
+        }
+        if (diameter > 300){
+          this.crossReset = true;
         }
       }
     }
@@ -270,31 +288,28 @@ let pharmacySketch = function (p) {
       p.pop();
     }
 
-    convertTemperature(val) {
-      return (val - 273).toFixed(2)
-    }
+    // convertTemperature(val) {
+    //   return (val - 273).toFixed(2)
+    // }
 
-    fetchTemperature(apik) {
-      //Collect all the information with the help of fetch method
-      //This is the api link from where all the information will be collected
+    // fetchTemperature(apik) {
+    //   //Collect all the information with the help of fetch method
+    //   //This is the api link from where all the information will be collected
       
-      fetch('https://api.openweathermap.org/data/2.5/weather?lat=52.4958&lon=4.7750&appid='+apik)
-      .then(res => res.json())
+    //   fetch('https://api.openweathermap.org/data/2.5/weather?lat=52.4958&lon=4.7750&appid='+apik)
+    //   .then(res => res.json())
 
-      .then(data => {
-        //Now you need to collect the necessary information with the API link. Now I will collect that information and store it in different constants.
-          this.rawTemp = data['main']['temp']
-      })
+    //   .then(data => {
+    //     //Now you need to collect the necessary information with the API link. Now I will collect that information and store it in different constants.
+    //       this.rawTemp = data['main']['temp']
+    //   })
       
-      //Now the condition must be added that what if you do not input anything in the input box.
-      .catch(err => alert(err))
-    }
+    //   //Now the condition must be added that what if you do not input anything in the input box.
+    //   .catch(err => alert(err))
+    // }
 
     makeTemperature() {
-      if(this.counter % 2000 == 0 || this.counter == 0) {
-        this.fetchTemperature("58a31d4f296b89970388c0ca730a6c82");
-        this.celsius = this.convertTemperature(this.rawTemp);
-      }
+      this.celsius = wTemp;
 
       p.push();
       p.fill(0, 255, 0);
@@ -303,7 +318,6 @@ let pharmacySketch = function (p) {
 
       p.push();
       p.fill(255, 0, 0);
-      p.textSize(this.bigSize / 5);
       p.textAlign(CENTER, CENTER);
       p.text(this.celsius + " C", this.x, this.y - 10);
       p.pop();
@@ -317,7 +331,6 @@ let pharmacySketch = function (p) {
       }
       if(this.counter%10 == 0) {
         this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
-        console.log('Counter: ', this.counter);
       }
 
       if(this.crossOutlines[0].getColor() > 230) {
@@ -326,16 +339,14 @@ let pharmacySketch = function (p) {
     }
 
     makeSnakes() {
-      this.makeFlashes(p.color(255, 0, 255));
-
-      this.counter += 1;
+      this.makeFlashes(p.color(255, 0, 146));
 
       //this.snakeLayer.background(0);
       this.snakeLayer.angleMode(p.DEGREES);
       this.snakeLayer.push();
       this.snakeLayer.rotateY(5 * this.counter);
       this.snakeLayer.rotateX(180);
-      this.snakeLayer.scale(2.5);
+      this.snakeLayer.scale(2.0);
 
       this.snakeLayer.clear();
       this.snakeLayer.stroke(0, 255, 0);
@@ -345,6 +356,21 @@ let pharmacySketch = function (p) {
 
       p.image(this.snakeLayer, this.xMask, this.yMask);
       this.snakeLayer.pop();
+    }
+
+    makeFarmacia() {
+      this.farmLayer.background(0, 255, 0);
+      this.farmLayer.fill(255, 0, 0);
+      for (let x = this.xStart; x <= this.farmLayer.width + this.scrollSize; x += this.scrollSize) { //use a for loop to draw the line of text multiple times down the vertical axis
+        
+        
+        this.farmLayer.text("Farmacia Distel", x, this.farmLayer.height/2 + this.textSize/2 - 10); //display text
+      }
+      this.xStart -= this.xSpeed; 
+
+      p.image(this.farmLayer, this.xLines, this.yLines);
+      
+      this.counter += 1;
     }
   }
 
