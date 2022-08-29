@@ -2,15 +2,22 @@ let pharmacySketch = function (p) {
   const CROSSAMOUNT = 2;
   const CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
-  let crossReset;
+  let fontRegular;
+  let snakeModel;
+
+  p.preload = function () {
+    fontRegular = p.loadFont('DDCHardware-Regular.ttf');
+    snakeModel = p.loadModel('assets/Spiraal.obj', true);
+  }
 
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
     canvas.position(0, 0);
-    //textLayer = p.createGraphics(windowWidth, windowHeight, p.P2D)
+
     p.smooth(); // Anti aliasing
     p.frameRate(FRAMERATE);
     p.pushCrosses();
+    p.textFont(fontRegular);
   }
 
   p.pushCrosses = function () {
@@ -29,13 +36,6 @@ let pharmacySketch = function (p) {
     }
 
     for (let i = 0; i < CROSSAMOUNT; i++) {
-      //met de push-functie voeg je een element toe
-      //aan het eind van de array.
-      //
-      //Het nieuwe object dat aangemaakt is vanuit 
-      //de class-omschrijving wordt in de array gezet.
-      //tegelijk wordt de constructor-method uit de
-      //class-omschrijving uitgevoerd.
       xPos += amountToDisplace;
       crossArray.push(new Cross(xPos, p.height / 2, CROSSSIZE));
     }
@@ -63,10 +63,16 @@ let pharmacySketch = function (p) {
       //met this.x, this.y, etc. wordt er een unieke 
       //variabele gemaakt die alleen voor het object
       //dat wordt gemaakt geldt.
+
+      // Global variables
       this.bigSize = size;
       this.smallSize = size / 3;
       this.x = xPos;
       this.y = yPos;
+
+      // Switching variables
+      this.previousCross = wCrossType;
+      this.crossReset = false;
 
       // Mask Variables
       this.maskSize = size * 2;
@@ -100,18 +106,33 @@ let pharmacySketch = function (p) {
       // Flash variables
       this.flashCounter = 0;
 
-      this.previousCross = wCrossType;
-      this.crossReset = false;
+      // Temperature variables
+      this.rawTemp = 0;
+      this.celsius = 0;
+      
+      // The matrix variables
 
+      // Recursieve Kruiskes
+      this.recursiveLayer = createGraphics(this.maskSize, this.maskSize);
+      this.recursiveAmount = 1
+      this.crossOutlines = [];
+      this.crossOutlineWidth = size/100*3;
+      this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
+      
 
-
+      // Snake variables
+      this.snakeLayer = createGraphics(this.maskSize, this.maskSize, p.WEBGL);
+      this.snakeLayer.angleMode(p.DEGREES);
+      this.snakeLayer.smooth();
     }
-    // je kan oneindig veel methods (functies binnen
-    // een object) aanmaken in je class-
-    // omschrijving.
+
     draw() {
       this.checkReset();
       switch (wCrossType) {
+        case 0:
+          this.makeFlashes();
+          this.crossReset = false;
+          break;
         case 1:
           this.makeRotateLines();
           this.crossReset = false;
@@ -124,8 +145,16 @@ let pharmacySketch = function (p) {
           this.makeHypnoCircles();
           this.crossReset = false;
           break;
-        case 0:
-          this.makeFlashes();
+        case 4:
+          this.makeTemperature();
+          this.crossReset = false;
+          break;
+        case 5:
+          this.makeRecursion();
+          this.crossReset = false;
+          break;
+        case 6:
+          this.makeSnakes();
           this.crossReset = false;
           break;
       }
@@ -194,6 +223,24 @@ let pharmacySketch = function (p) {
       p.image(this.lineLayer, this.xLines, this.yLines);
     }
 
+    resetCircle() {
+      if (this.crossReset) {
+        this.circleGrowth = this.circleAmount * this.circleMargin * -1;
+      } else {
+        this.circleGrowth += this.circleGrowSpeed;
+      }
+    };
+
+    drawCircles() {
+      for (let i = this.circleAmount; i > 0; i += -1) {
+        let diameter = i * this.circleMargin + this.circleGrowth;
+        if (diameter > 0) {
+          this.circleLayer.fill(0, 255 * (i % 2), 0);
+          this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
+        }
+      }
+    }
+
     makeHypnoCircles() {
       this.circleLayer.background(0);
 
@@ -201,35 +248,147 @@ let pharmacySketch = function (p) {
       this.circleLayer.fill(0, 255, 0);
       this.circleLayer.noStroke();
 
-      if (this.crossReset) {
-        this.circleGrowth = this.circleAmount * this.circleMargin * -1;
-      } else {
-        this.circleGrowth += this.circleGrowSpeed;
-      }
+      this.resetCircle();
 
-      for (let i = this.circleAmount; i > 0; i += -1) {
-        let diameter = i * this.circleMargin + this.circleGrowth;
-        if (diameter > 0) {
-          this.circleLayer.fill(0, 255 * (i % 2), 0);
-          this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
-        }
-
-      }
+      this.drawCircles();
+      
       this.circleLayer.pop();
       p.image(this.circleLayer, this.xLines, this.yLines);
     }
 
-    makeFlashes() {
+    makeFlashes(color = p.color(0, 255, 0)) {
       this.flashCounter += 1;
       p.push();
       if (this.flashCounter % 10 < 5) {
         p.fill(0);
       } else {
-        p.fill(0, 255, 0);
+        p.fill(color);
       }
-      //p.rectMode(p.CENTER);
+
       p.rect(this.x, this.y, this.bigSize, this.bigSize);
       p.pop();
+    }
+
+    convertTemperature(val) {
+      return (val - 273).toFixed(2)
+    }
+
+    fetchTemperature(apik) {
+      //Collect all the information with the help of fetch method
+      //This is the api link from where all the information will be collected
+      
+      fetch('https://api.openweathermap.org/data/2.5/weather?lat=52.4958&lon=4.7750&appid='+apik)
+      .then(res => res.json())
+
+      .then(data => {
+        //Now you need to collect the necessary information with the API link. Now I will collect that information and store it in different constants.
+          this.rawTemp = data['main']['temp']
+      })
+      
+      //Now the condition must be added that what if you do not input anything in the input box.
+      .catch(err => alert(err))
+    }
+
+    makeTemperature() {
+      if(this.counter % 2000 == 0 || this.counter == 0) {
+        this.fetchTemperature("58a31d4f296b89970388c0ca730a6c82");
+        this.celsius = this.convertTemperature(this.rawTemp);
+      }
+
+      p.push();
+      p.fill(0, 255, 0);
+      p.rect(this.x, this.y, this.bigSize, this.bigSize);
+      p.pop();
+
+      p.push();
+      p.fill(255, 0, 0);
+      p.textSize(this.bigSize / 5);
+      p.textAlign(CENTER, CENTER);
+      p.text(this.celsius + " C", this.x, this.y - 10);
+      p.pop();
+      this.counter += 1;
+    }
+
+    makeRecursion() {
+      this.counter += 1;
+      for (let i=0;i<this.crossOutlines.length;i++) {
+        this.crossOutlines[i].draw(-0.03, 0, 0, 7);
+      }
+      if(this.counter%10 == 0) {
+        this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
+      }
+
+      if(this.crossOutlines[0].getColor() > 230) {
+        this.crossOutlines.shift();
+      }
+    }
+
+    makeSnakes() {
+      this.makeFlashes(p.color(255, 0, 255));
+
+      this.counter += 1;
+      this.snakeLayer.background(0);
+      this.snakeLayer.push();
+      this.snakeLayer.rotateY(5 * this.counter);
+      this.snakeLayer.rotateX(180);
+      this.snakeLayer.scale(1.5);
+
+      this.snakeLayer.clear();
+      this.snakeLayer.stroke(0, 255, 0);
+      this.snakeLayer.fill(0, 255, 0);
+      this.snakeLayer.model(snakeModel);
+      
+
+      p.image(this.snakeLayer, this.xMask, this.yMask);
+      this.snakeLayer.pop();
+    }
+  }
+
+  class crossOutline {
+    constructor(posX, posY, bigSize, smallSize, stroke) {
+        this.x = posX;
+        this.y = posY;
+        this.bigSize = bigSize;
+        this.smallSize = smallSize;
+        this.scale = 1;
+        this.color = 0;
+        this.stroke = stroke;
+    }
+
+    draw(scale, transX, transY, colour) {
+      p.push();
+      p.noFill();
+      p.strokeWeight(this.stroke);
+
+      this.color += colour;
+      p.stroke(this.color, 255, this.color);
+
+      this.x += transX;
+      this.y += transY;
+      p.translate(this.x, this.y);
+
+      this.scale += scale;
+      p.scale(this.scale);
+      
+      p.beginShape();
+      p.vertex(this.smallSize / 2, -this.bigSize / 2) // Top Right
+      p.vertex(-this.smallSize / 2, -this.bigSize / 2) // Top Left
+      p.vertex(-this.smallSize/2, -this.smallSize / 2) // Top left corner
+      p.vertex(-this.bigSize/2, -this.smallSize / 2) // Left top
+      p.vertex(-this.bigSize/2, this.smallSize / 2) // Left bot
+      p.vertex(-this.smallSize/2, this.smallSize / 2) // Bot left corner
+      p.vertex(-this.smallSize / 2, this.bigSize / 2) // Bot Left
+      p.vertex(this.smallSize / 2, this.bigSize / 2) // Bot Left
+      p.vertex(this.smallSize/2, this.smallSize / 2) // Bot right corner
+      p.vertex(this.bigSize/2, this.smallSize / 2) // Right bot
+      p.vertex(this.bigSize/2, -this.smallSize / 2) // Right top
+      p.vertex(this.smallSize/2, -this.smallSize / 2) // Top right corner
+      p.endShape(CLOSE);
+      p.pop();
+    }
+
+    getColor() {
+      return(this.color);
     }
   }
 
