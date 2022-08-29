@@ -104,7 +104,7 @@ let pharmacySketch = function (p) {
       this.circleLayer = createGraphics(this.bigSize, this.bigSize);
 
       // Flash variables
-      this.flashCounter = 0;
+      this.counter = 0;
 
       // Temperature variables
       this.rawTemp = 0;
@@ -257,9 +257,9 @@ let pharmacySketch = function (p) {
     }
 
     makeFlashes(color = p.color(0, 255, 0)) {
-      this.flashCounter += 1;
+      this.counter += 1;
       p.push();
-      if (this.flashCounter % 10 < 5) {
+      if (this.counter % 10 < 5) {
         p.fill(0);
       } else {
         p.fill(color);
