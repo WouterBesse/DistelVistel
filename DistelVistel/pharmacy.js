@@ -1,5 +1,5 @@
 let pharmacySketch = function (p) {
-  const CROSSAMOUNT = 2;
+  const CROSSAMOUNT = 1;
   const CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
   let fontRegular;
@@ -107,6 +107,7 @@ let pharmacySketch = function (p) {
       this.counter = 0;
 
       // Temperature variables
+      p.textSize(this.bigSize / 5);
       this.rawTemp = 0;
       this.celsius = 0.0;
       
@@ -124,11 +125,20 @@ let pharmacySketch = function (p) {
       this.snakeLayer = createGraphics(this.maskSize, this.maskSize, p.WEBGL);
       
       this.snakeLayer.smooth();
+
+      // Farmacia Variables
+      this.farmLayer = createGraphics(this.bigSize, this.bigSize);
+      this.xSpeed = 5
+      this.xStart = 0;
+      p.textAlign(CENTER, CENTER);
+      this.farmLayer.textSize(this.bigSize /5);
+      this.scrollSize = this.bigSize * 2;
+      this.textSize = this.bigSize/5;
+      this.farmLayer.textFont(fontRegular);
     }
 
     draw() {
       this.checkReset();
-      console.log(wCrossType);
       switch (wCrossType) {
         case 0:
           this.makeFlashes();
@@ -289,7 +299,6 @@ let pharmacySketch = function (p) {
 
       p.push();
       p.fill(255, 0, 0);
-      p.textSize(this.bigSize / 5);
       p.textAlign(CENTER, CENTER);
       p.text(this.celsius.toFixed(2) + " C", this.x, this.y - 10);
       p.pop();
@@ -303,7 +312,6 @@ let pharmacySketch = function (p) {
       }
       if(this.counter%10 == 0) {
         this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
-        console.log('Counter: ', this.counter);
       }
 
       if(this.crossOutlines[0].getColor() > 230) {
@@ -332,17 +340,17 @@ let pharmacySketch = function (p) {
     }
 
     makeFarmacia() {
-      p.push();
-      p.fill(0, 255, 0);
-      p.rect(this.x, this.y, this.bigSize, this.bigSize);
-      p.pop();
+      this.farmLayer.background(0, 255, 0);
+      this.farmLayer.fill(255, 0, 0);
+      for (let x = this.xStart; x <= this.farmLayer.width + this.scrollSize; x += this.scrollSize) { //use a for loop to draw the line of text multiple times down the vertical axis
+        
+        
+        this.farmLayer.text("Farmacia Distel", x, this.farmLayer.height/2 + this.textSize/2 - 10); //display text
+      }
+      this.xStart -= this.xSpeed; 
 
-      p.push();
-      p.fill(255, 0, 0);
-      p.textSize(this.bigSize / 5);
-      p.textAlign(CENTER, CENTER);
-      p.text("Farmacia Distel", this.x, this.y - 10);
-      p.pop();
+      p.image(this.farmLayer, this.xLines, this.yLines);
+      
       this.counter += 1;
     }
   }

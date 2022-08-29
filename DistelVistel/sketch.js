@@ -121,7 +121,7 @@ function oscReceiver(address, msg) {
       sceneChange = true;
       break;
     case "/wCrossType":
-      //wCrossType = msg;
+      wCrossType = msg;
       break;
     case "/wShapeType":
       wShapeType = msg;
