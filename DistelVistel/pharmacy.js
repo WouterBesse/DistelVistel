@@ -122,12 +122,13 @@ let pharmacySketch = function (p) {
 
       // Snake variables
       this.snakeLayer = createGraphics(this.maskSize, this.maskSize, p.WEBGL);
-      this.snakeLayer.angleMode(p.DEGREES);
+      
       this.snakeLayer.smooth();
     }
 
     draw() {
       this.checkReset();
+      console.log(wCrossType);
       switch (wCrossType) {
         case 0:
           this.makeFlashes();
@@ -316,6 +317,7 @@ let pharmacySketch = function (p) {
       }
       if(this.counter%10 == 0) {
         this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
+        console.log('Counter: ', this.counter);
       }
 
       if(this.crossOutlines[0].getColor() > 230) {
@@ -327,11 +329,13 @@ let pharmacySketch = function (p) {
       this.makeFlashes(p.color(255, 0, 255));
 
       this.counter += 1;
-      this.snakeLayer.background(0);
+
+      //this.snakeLayer.background(0);
+      this.snakeLayer.angleMode(p.DEGREES);
       this.snakeLayer.push();
       this.snakeLayer.rotateY(5 * this.counter);
       this.snakeLayer.rotateX(180);
-      this.snakeLayer.scale(1.5);
+      this.snakeLayer.scale(2.5);
 
       this.snakeLayer.clear();
       this.snakeLayer.stroke(0, 255, 0);
