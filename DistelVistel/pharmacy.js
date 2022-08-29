@@ -254,8 +254,8 @@ let pharmacySketch = function (p) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
         }
-        if (diameter > 300){
-          this.crossReset = TRUE;
+        if (diameter > this.bigSize){
+          this.crossReset = true;
         }
       }
     }
@@ -298,7 +298,7 @@ let pharmacySketch = function (p) {
       p.pop();
 
       p.push();
-      p.fill(255, 0, 0);
+      p.fill(255, 0, 146);
       p.textAlign(CENTER, CENTER);
       p.text(this.celsius.toFixed(2) + " C", this.x, this.y - 10);
       p.pop();
