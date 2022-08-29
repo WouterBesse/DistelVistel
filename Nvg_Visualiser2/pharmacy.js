@@ -4,14 +4,12 @@ let pharmacySketch = function (p) {
   let crossArray = [];
   let crossReset;
 
-
   p.setup = function () {
     canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
     canvas.position(0, 0);
     //textLayer = p.createGraphics(windowWidth, windowHeight, p.P2D)
     p.smooth(); // Anti aliasing
     p.frameRate(FRAMERATE);
-
     p.pushCrosses();
   }
 
@@ -53,7 +51,6 @@ let pharmacySketch = function (p) {
 
   p.draw = function () {
     p.background(0);
-
     p.drawCrosses();
   }
 
