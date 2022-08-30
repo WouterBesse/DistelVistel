@@ -39,7 +39,7 @@ let shapeSketch = function (p) {
     }
 
     p.draw = function () {
-        console.log("amp: ",wFrequencyAmplitude[0]);
+        console.log("amp: ", wFrequencyAmplitude[0]);
         mult = p.map(wFrequencyAmplitude[0], 0, 1000, 0, 3);
         console.log("mult: ", mult);
         m1 = p.map(sin(p.millis() / 1000), -1, 1, 0, 5) + mult;
@@ -52,7 +52,7 @@ let shapeSketch = function (p) {
         p.rotateX(millis() / 1100)
 
         p.background(0);
-        p.scale(1+mult/3);
+        p.scale(1 + mult / 3);
         var r = 200;
         for (var i = 0; i < total + 1; i++) {
             var lat = p.map(i, 0, total, -HALF_PI, HALF_PI);
@@ -69,15 +69,15 @@ let shapeSketch = function (p) {
                 globe[index] = p.createVector(x, y, z);
             }
         }
-        
-        switch(wMaterial){
+
+        switch (wMaterial) {
             case 0:
                 p.normalMaterial();
                 break;
             case 1:
                 p.stroke(255);
                 p.noFill();
-                //p.fill(200);
+            //p.fill(200);
         }
 
         offset += 5;
