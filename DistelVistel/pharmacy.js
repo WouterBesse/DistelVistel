@@ -253,7 +253,7 @@ let pharmacySketch = function (p) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
         }
-        if (diameter > this.bigSize){
+        if (diameter > this.smallSize){
           this.crossReset = true;
         }
       }
