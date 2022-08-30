@@ -297,9 +297,9 @@ let pharmacySketch = function (p) {
       p.pop();
 
       p.push();
-      p.fill(255, 0, 146);
+      p.fill(255, 0, 0);
       p.textAlign(CENTER, CENTER);
-      p.text(this.celsius.toFixed(2) + " C", this.x, this.y - 10);
+      p.text(this.celsius.toFixed(2) + " °C", this.x, this.y - 10);
       p.pop();
       this.counter += 1;
     }
@@ -319,7 +319,7 @@ let pharmacySketch = function (p) {
     }
 
     makeSnakes() {
-      this.makeFlashes(p.color(255, 0, 146));
+      this.makeFlashes(p.color(255, 0, 0));
 
       //this.snakeLayer.background(0);
       this.snakeLayer.angleMode(p.DEGREES);
