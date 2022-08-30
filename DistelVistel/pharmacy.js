@@ -253,7 +253,7 @@ let pharmacySketch = function (p) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
         }
-        if (diameter > this.smallSize){
+        if (diameter > this.smallSize * 0.1){
           this.crossReset = true;
         }
       }
@@ -306,8 +306,9 @@ let pharmacySketch = function (p) {
 
     makeRecursion() {
       this.counter += 1;
+      let xMovement = (wFrequency - 0.0025) * 10;
       for (let i=0;i<this.crossOutlines.length;i++) {
-        this.crossOutlines[i].draw(-0.03, 0, 0, 7);
+        this.crossOutlines[i].draw(-0.03, xMovement, 0, 7);
       }
       if(this.counter%10 == 0) {
         this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
@@ -371,8 +372,7 @@ let pharmacySketch = function (p) {
       this.color += colour;
       p.stroke(this.color, 255, this.color);
 
-      this.x += transX;
-      this.y += transY;
+      
       p.translate(this.x, this.y);
 
       this.scale += scale;
@@ -393,6 +393,9 @@ let pharmacySketch = function (p) {
       p.vertex(this.smallSize/2, -this.smallSize / 2) // Top right corner
       p.endShape(CLOSE);
       p.pop();
+
+      this.x = this.x + this.x * transX;
+      this.y += transY;
     }
 
     getColor() {
