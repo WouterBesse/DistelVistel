@@ -2,7 +2,7 @@ let djSketch = function (p) {
   const black = color(0, 0, 0);
   const white = color(255, 255, 255);
   const BLINKTHRESH = 2;
-  const AMPTHRESH = 1024;
+  const AMPTHRESH = 208;
   let canvas;
 
   p.preload = function () {

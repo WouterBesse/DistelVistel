@@ -132,6 +132,9 @@ function oscReceiver(address, msg) {
     case "/wTemp":
       wTemp = msg;
       break;
+    case "/crossRecursionX":
+      crossRecursionX = msg;
+      break;
   }
 }
 
