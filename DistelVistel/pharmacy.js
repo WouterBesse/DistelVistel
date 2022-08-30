@@ -85,10 +85,11 @@ let pharmacySketch = function (p) {
       this.lineRotateSpeed = 0.1;
       this.lineRot = 0;
 
-      this.lineGrowSpeed = 0.5;
+      this.lineGrowSpeed = 1.;
       this.lineGrowWidth = 0;
 
       this.lineLayer = createGraphics(this.bigSize, this.bigSize);
+      this.lineLayer.rectMode(p.CENTER);
       this.lineHeight = Math.sqrt(Math.pow(this.maskSize, 2) / 2); // Make the line height so that the diagonal is not bigger than the size of the mask
       this.lineWidth = this.lineHeight / 2 / this.lineAmount;
       this.lineX = 0 - this.lineHeight / 2;
@@ -97,7 +98,7 @@ let pharmacySketch = function (p) {
 
       // Circle Variables
       this.circleAmount = 50;
-      this.circleGrowSpeed = 3;
+      this.circleGrowSpeed = 5;
       this.circleMargin = size / 2 / this.circleAmount * 5;
       this.circleGrowth = this.circleAmount * this.circleMargin * -1;
 
@@ -198,7 +199,7 @@ let pharmacySketch = function (p) {
 
     makeRotateLines() {
       this.lineLayer.background(0);
-      this.lineLayer.rectMode(p.CENTER);
+      
 
       this.lineLayer.push();
       this.lineLayer.fill(0, 255, 0);
@@ -222,11 +223,10 @@ let pharmacySketch = function (p) {
       this.lineLayer.push();
       this.lineLayer.fill(0, 255, 0);
       this.lineLayer.noStroke();
-      this.lineLayer.translate(this.bigSize / 2, 0);
 
       for (var s = 0; s < this.lineAmount; s = s + 1) {
-        let curX = this.lineX + s * this.lineWidth * 2;
-        this.lineLayer.rect(curX, 0, this.lineGrowWidth, this.lineHeight);
+        let curX = s * this.lineWidth * 2;
+        this.lineLayer.rect(curX, this.bigSize / 2, this.lineGrowWidth, this.lineHeight);
       }
       this.lineLayer.pop();
 
@@ -249,7 +249,6 @@ let pharmacySketch = function (p) {
     drawCircles() {
       for (let i = this.circleAmount; i > 0; i += -1) {
         let diameter = i * this.circleMargin + this.circleGrowth;
-        console.log(diameter);
         if (diameter > 0) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
@@ -327,7 +326,7 @@ let pharmacySketch = function (p) {
       this.snakeLayer.push();
       this.snakeLayer.rotateY(5 * this.counter);
       this.snakeLayer.rotateX(180);
-      this.snakeLayer.scale(2.0);
+      this.snakeLayer.scale(this.bigSize / 200);
 
       this.snakeLayer.clear();
       this.snakeLayer.stroke(0, 255, 0);
@@ -343,8 +342,6 @@ let pharmacySketch = function (p) {
       this.farmLayer.background(0, 255, 0);
       this.farmLayer.fill(255, 0, 0);
       for (let x = this.xStart; x <= this.farmLayer.width + this.scrollSize; x += this.scrollSize) { //use a for loop to draw the line of text multiple times down the vertical axis
-        
-        
         this.farmLayer.text("Farmacia Distel", x, this.farmLayer.height/2 + this.textSize/2 - 10); //display text
       }
       this.xStart -= this.xSpeed; 
