@@ -7,6 +7,7 @@ let ASCIISketch = function (p) {
     const h = 48;
 
     let video;
+    let frame
 
     p.setup = function () {
         canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
@@ -22,15 +23,20 @@ let ASCIISketch = function (p) {
 
     p.draw = function () {
         p.background(0);
-        //p.image(video, 0, 0, width, width * video.height / video.width);
         p.textSize(windowWidth / w);
         p.textAlign(CENTER, CENTER);
+
+        p.image(video, 0, 0, width, width * video.height / video.width);
+        //frame = p.image(video, 0, 0, width, width * video.height / video.width);
+
+
         video.loadPixels();
-        d = pixelDensity();
+
+        //console.log(frame.pixels);
+
         for (let j = 0; j < video.height; j++) {
             for (let i = 0; i < video.width; i++) {
-                //let pixelIndex = (i + j * w) * 4;
-                let pixelIndex = 4 * (i + j * video.width);
+                let pixelIndex = (i + j * w) * 4;
                 let r = video.pixels[pixelIndex + 0];
                 let g = video.pixels[pixelIndex + 1];
                 let b = video.pixels[pixelIndex + 2];
