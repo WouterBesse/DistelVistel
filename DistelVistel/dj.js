@@ -2,7 +2,7 @@ let djSketch = function (p) {
   const black = color(0, 0, 0);
   const white = color(255, 255, 255);
   const BLINKTHRESH = 2;
-  const AMPTHRESH = 1024;
+  const AMPTHRESH = 400;
   let canvas;
 
   p.preload = function () {
@@ -49,7 +49,7 @@ let djSketch = function (p) {
     let dj = p.chooseDJ();
     p.drawBackground();
 
-    let constrained = p.constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
+    let constrained = p.map(wFrequencyAmplitude[0], 0, 1000, 1, 1.6);
     p.ortho();
     p.angleMode(p.DEGREES);
 
