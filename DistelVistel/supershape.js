@@ -39,14 +39,14 @@ let shapeSketch = function (p) {
     }
 
     p.draw = function () {
-        console.log("amp: ", wFrequencyAmplitude[0]);
+        //console.log("amp: ", wFrequencyAmplitude[0]);
         mult = p.map(wFrequencyAmplitude[0], 0, 1000, 0, 3);
-        console.log("mult: ", mult);
+        //console.log("mult: ", mult);
         m1 = p.map(sin(p.millis() / 1000), -1, 1, 0, 5) + mult;
         m2 = p.map(sin(p.millis() / 3333), -1, 1, 0, 5);
 
         let nRow = wShapeType;
-        console.log(nRow);
+        //console.log(nRow);
 
         p.rotateY(millis() / 600);
         p.rotateX(millis() / 1100)
