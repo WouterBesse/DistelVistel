@@ -1,18 +1,18 @@
 // Global Vars
-const NUMOFSCENES = 8;
+const NUMOFSCENES = 7;
 const VERBOSE = false;
 const FRAMERATE = 60;
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-let scene = 9;
+let scene = 1;
 let sceneChange = false;
 let createdCanvas = 0;
 let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
 
 let sceneDoms;
 let scenes;
-let sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6, 7];
+let sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6];
 
 // Global Waves Vars
 let wColorMode = 0; // 0 = kleur, 1 = monochroom
@@ -36,8 +36,9 @@ function preload() {
     new p5(pharmacySketch),
     new p5(terrainSketch),
     new p5(vinylSketch),
-    new p5(shapeSketch),
-    new p5(ASCIISketch)
+    new p5(shapeSketch)
+    // ,
+    // new p5(ASCIISketch)
   ];
   sceneDoms = document.getElementsByClassName("p5Canvas");
 }
