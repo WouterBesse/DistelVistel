@@ -1,31 +1,31 @@
-void pharmacySketch = function (p) {
-   static final CROSSAMOUNT = 1;
-   static final CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
-  let crossArray = [];
+class pharmacySketchd {
+  final static int CROSSAMOUNT = 1;
+  final static int CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
+  let crossArray []= {};
   let fontRegular;
   let snakeModel;
 
   // Global functions
 
-  void p.preload = function () {
-    fontRegular = p.loadFont('DDCHardware-Regular.ttf');
-    snakeModel = p.loadModel('assets/Spiraal.obj', true);
+  void preload  () {
+    fontRegular = loadFont('DDCHardware-Regular.ttf');
+    snakeModel = loadModel('assets/Spiraal.obj', true);
   }
 
-  void p.setup = function () {
-    canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
+  void setup  () {
+    canvas = createCanvas(windowWidth, windowHeight, P2D);
     canvas.position(0, 0);
 
-    p.smooth(); // Anti aliasing
-    p.frameRate(FRAMERATE);
-    p.pushCrosses();
-    p.textFont(fontRegular);
+    smooth(); // Anti aliasing
+    frameRate(FRAMERATE);
+    pushCrosses();
+    textFont(fontRegular);
   }
 
-  void p.pushCrosses = function () {
+  void pushCrosses  () {
     // Calculation to evenly distribute objects along x axis
     int totalObjectWidth = CROSSAMOUNT * CROSSSIZE;
-    int screenWidth = p.width;
+    int screenWidth = width;
     int totalMarginSpace = screenWidth - totalObjectWidth;
     int amountToDisplace = totalMarginSpace / (CROSSAMOUNT + 1) + CROSSSIZE;
     int xPos = -CROSSSIZE / 2;
@@ -39,11 +39,11 @@ void pharmacySketch = function (p) {
 
     for (int i = 0; i < CROSSAMOUNT; i++) {
       xPos += amountToDisplace;
-      crossArray.push(new Cross(xPos, p.height / 2, CROSSSIZE));
+      crossArray.push(new Cross(xPos, height / 2, CROSSSIZE));
     }
   }
 
-  void p.drawCrosses = function () {
+  void drawCrosses  () {
     for (int i = 0; i < crossArray.length; i++) {
       //voer de teken-method uit de class-
       //omschrijving uit.
@@ -51,18 +51,18 @@ void pharmacySketch = function (p) {
     }
   }
 
-  void p.draw = function () {
-    p.background(0);
-    p.drawCrosses();
+  void draw  () {
+    background(0);
+    drawCrosses();
   }
 
   class Cross {
-    // Deze constructor-method wordt uitgevoerd zodra er 
+    // Deze constructor-method wordt uitgevoerd zodra er
     // een nieuw object vanuit deze class-omschrijving wordt
     // gemaakt.
-    public constructor(xPos, yPos, size) {
-      p.rectMode(p.CENTER);
-      //met this.x, this.y, etc. wordt er een unieke 
+    public constructor(int xPos, int yPos, int size) {
+      rectMode(CENTER);
+      //met this.x, this.y, etc. wordt er een unieke
       //variabele gemaakt die alleen voor het object
       //dat wordt gemaakt geldt.
 
@@ -91,7 +91,7 @@ void pharmacySketch = function (p) {
       this.lineGrowWidth = 0;
 
       this.lineLayer = createGraphics(this.bigSize, this.bigSize);
-      this.lineLayer.rectMode(p.CENTER);
+      this.lineLayer.rectMode(CENTER);
       this.lineHeight = Math.sqrt(Math.pow(this.maskSize, 2) / 2); // Make the line height so that the diagonal is not bigger than the size of the mask
       this.lineWidth = this.lineHeight / 2 / this.lineAmount;
       this.lineX = 0 - this.lineHeight / 2;
@@ -109,7 +109,7 @@ void pharmacySketch = function (p) {
       this.counter = 0;
 
       // Temperature variables
-      p.textSize(this.bigSize / 5);
+      textSize(this.bigSize / 5);
       this.rawTemp = 0;
       this.celsius = 0.0;
 
@@ -117,21 +117,21 @@ void pharmacySketch = function (p) {
 
       // Recursieve Kruiskes
       this.recursiveLayer = createGraphics(this.maskSize, this.maskSize);
-      this.recursiveAmount = 1
-      this.crossOutlines = [];
+      this.recursiveAmount = 1;
+      this.crossOutlines = new float [] {};
       this.crossOutlineWidth = size / 100 * 3;
       this.crossOutlines.push(new crossOutline(this.x, this.y, this.bigSize, this.smallSize, this.crossOutlineWidth));
 
 
       // Snake variables
-      this.snakeLayer = createGraphics(this.maskSize, this.maskSize, p.WEBGL);
+      this.snakeLayer = createGraphics(this.maskSize, this.maskSize, WEBGL);
       this.snakeLayer.smooth();
 
       // Farmacia Variables
       this.farmLayer = createGraphics(this.bigSize, this.bigSize);
-      this.xSpeed = 5
+      this.xSpeed = 5;
       this.xStart = 0;
-      p.textAlign(CENTER, CENTER);
+      textAlign(CENTER, CENTER);
       this.farmLayer.textSize(this.bigSize / 5);
       this.scrollSize = this.bigSize * 2;
       this.textSize = this.bigSize / 5;
@@ -142,41 +142,40 @@ void pharmacySketch = function (p) {
     void draw() {
       this.checkReset();
       switch (wCrossType) {
-        case 0:
-          this.makeFlashes();
-          this.crossReset = false;
-          break;
-        case 1:
-          this.makeRotateLines();
-          this.crossReset = false;
-          break;
-        case 2:
-          this.makeGrowingLines();
-          this.crossReset = false;
-          break;
-        case 3:
-          this.makeHypnoCircles();
-          this.crossReset = false;
-          break;
-        case 4:
-          this.makeTemperature();
-          this.crossReset = false;
-          break;
-        case 5:
-          this.makeRecursion();
-          this.crossReset = false;
-          break;
-        case 6:
-          this.makeSnakes();
-          this.crossReset = false;
-          break;
-        case 7:
-          this.makeFarmacia();
-          this.crossReset = false;
-          break;
+      case 0:
+        this.makeFlashes();
+        this.crossReset = false;
+        break;
+      case 1:
+        this.makeRotateLines();
+        this.crossReset = false;
+        break;
+      case 2:
+        this.makeGrowingLines();
+        this.crossReset = false;
+        break;
+      case 3:
+        this.makeHypnoCircles();
+        this.crossReset = false;
+        break;
+      case 4:
+        this.makeTemperature();
+        this.crossReset = false;
+        break;
+      case 5:
+        this.makeRecursion();
+        this.crossReset = false;
+        break;
+      case 6:
+        this.makeSnakes();
+        this.crossReset = false;
+        break;
+      case 7:
+        this.makeFarmacia();
+        this.crossReset = false;
+        break;
       }
       this.makeCrossMask();
-
     }
 
     void checkReset() {
@@ -188,53 +187,53 @@ void pharmacySketch = function (p) {
 
     void makeCrossMask() {
       this.maskLayer.background(0);
-      this.maskLayer.rectMode(p.CENTER);
+      this.maskLayer.rectMode(CENTER);
 
       this.maskLayer.erase();
       this.maskLayer.rect(this.maskSize / 2, this.maskSize / 2, this.bigSize, this.smallSize);
       this.maskLayer.rect(this.maskSize / 2, this.maskSize / 2, this.smallSize, this.bigSize);
       this.maskLayer.noErase();
 
-      p.image(this.maskLayer, this.xMask, this.yMask);
+      image(this.maskLayer, this.xMask, this.yMask);
 
 
-      // Create outline <---------------------------------------------------------------- Willen we dit? Staat beter bij temperatuur, snake, farmacia en 
-      //                                                                                  flashes, maar maakt de illusie minder bij de andere kruizen. 
-      //                                                                                  Miss sws even naar de kleuren kijken 
-      p.push();
-      p.translate(windowWidth / 2, windowHeight / 2);
-      p.stroke(255, 0, 0);
-      p.noFill();
-      p.strokeWeight(5);
-      p.beginShape();
-      p.vertex(this.smallSize / 2, -this.bigSize / 2) // Top Right
-      p.vertex(-this.smallSize / 2, -this.bigSize / 2) // Top Left
-      p.vertex(-this.smallSize / 2, -this.smallSize / 2) // Top left corner
-      p.vertex(-this.bigSize / 2, -this.smallSize / 2) // Left top
-      p.vertex(-this.bigSize / 2, this.smallSize / 2) // Left bot
-      p.vertex(-this.smallSize / 2, this.smallSize / 2) // Bot left corner
-      p.vertex(-this.smallSize / 2, this.bigSize / 2) // Bot Left
-      p.vertex(this.smallSize / 2, this.bigSize / 2) // Bot Left
-      p.vertex(this.smallSize / 2, this.smallSize / 2) // Bot right corner
-      p.vertex(this.bigSize / 2, this.smallSize / 2) // Right bot
-      p.vertex(this.bigSize / 2, -this.smallSize / 2) // Right top
-      p.vertex(this.smallSize / 2, -this.smallSize / 2) // Top right corner
-      p.endShape(CLOSE);
-      p.pop();
+      // Create outline <---------------------------------------------------------------- Willen we dit? Staat beter bij temperatuur, snake, farmacia en
+      //                                                                                  flashes, maar maakt de illusie minder bij de andere kruizen.
+      //                                                                                  Miss sws even naar de kleuren kijken
+      push();
+      translate(windowWidth / 2, windowHeight / 2);
+      stroke(255, 0, 0);
+      noFill();
+      strokeWeight(5);
+      beginShape();
+      vertex(this.smallSize / 2, -this.bigSize / 2); // Top Right
+        vertex(-this.smallSize / 2, -this.bigSize / 2); // Top Left
+        vertex(-this.smallSize / 2, -this.smallSize / 2); // Top left corner
+        vertex(-this.bigSize / 2, -this.smallSize / 2); // Left top
+        vertex(-this.bigSize / 2, this.smallSize / 2); // Left bot
+        vertex(-this.smallSize / 2, this.smallSize / 2); // Bot left corner
+        vertex(-this.smallSize / 2, this.bigSize / 2); // Bot Left
+        vertex(this.smallSize / 2, this.bigSize / 2); // Bot Left
+        vertex(this.smallSize / 2, this.smallSize / 2); // Bot right corner
+        vertex(this.bigSize / 2, this.smallSize / 2); // Right bot
+        vertex(this.bigSize / 2, -this.smallSize / 2); // Right top
+        vertex(this.smallSize / 2, -this.smallSize / 2); // Top right corner
+        endShape(CLOSE);
+      pop();
     }
 
     // Cross 0: Flashing crosses
-    void makeFlashes(color = p.color(0, 255, 0)) {
+    void makeFlashes () {
       this.counter += 1;
-      p.push();
+      push();
       if (this.counter % 10 < 5) {
-        p.fill(0);
+        fill(0);
       } else {
-        p.fill(color);
+        fill(0,255,0);
       }
 
-      p.rect(this.x, this.y, this.bigSize, this.bigSize);
-      p.pop();
+      rect(this.x, this.y, this.bigSize, this.bigSize);
+      pop();
     }
 
     // Cross 1: Rotating lines
@@ -256,7 +255,7 @@ void pharmacySketch = function (p) {
 
       this.lineLayer.pop();
 
-      p.image(this.lineLayer, this.xLines, this.yLines);
+      image(this.lineLayer, this.xLines, this.yLines);
     }
 
     // Cross 2: Growing lines
@@ -278,7 +277,7 @@ void pharmacySketch = function (p) {
         this.lineGrowWidth = 0;
       }
 
-      p.image(this.lineLayer, this.xLines, this.yLines);
+      image(this.lineLayer, this.xLines, this.yLines);
     }
 
     // Cross 3: Growing circles
@@ -315,7 +314,7 @@ void pharmacySketch = function (p) {
       this.drawCircles();
 
       this.circleLayer.pop();
-      p.image(this.circleLayer, this.xLines, this.yLines);
+      image(this.circleLayer, this.xLines, this.yLines);
     }
 
     // Cross 4: Temperature
@@ -323,17 +322,17 @@ void pharmacySketch = function (p) {
       this.celsius = wTemp;
       //console.log (this.celsius.toFixed(2));
 
-      p.push();
-      p.fill(0, 255, 0);
-      p.rect(this.x, this.y, this.bigSize, this.bigSize);
-      p.stroke(255, 255, 255);
-      p.pop();
+      push();
+      fill(0, 255, 0);
+      rect(this.x, this.y, this.bigSize, this.bigSize);
+      stroke(255, 255, 255);
+      pop();
 
-      p.push();
-      p.fill(255, 0, 0);
-      p.textAlign(CENTER, CENTER);
-      p.text(this.celsius.toFixed(2) + " °C", this.x, this.y - 10);
-      p.pop();
+      push();
+      fill(255, 0, 0);
+      textAlign(CENTER, CENTER);
+      text(this.celsius.toFixed(2) + " °C", this.x, this.y - 10);
+      pop();
       this.counter += 1;
     }
 
@@ -355,10 +354,10 @@ void pharmacySketch = function (p) {
 
     // Cross 6: Rotating snakes
     void makeSnakes() {
-      this.makeFlashes(p.color(255, 0, 0));
+      this.makeFlashes(color(255, 0, 0));
 
       //this.snakeLayer.background(0);
-      this.snakeLayer.angleMode(p.DEGREES);
+      this.snakeLayer.angleMode(DEGREES);
       this.snakeLayer.push();
       this.snakeLayer.rotateY(5 * this.counter);
       this.snakeLayer.rotateX(180);
@@ -370,7 +369,7 @@ void pharmacySketch = function (p) {
       this.snakeLayer.model(snakeModel);
 
 
-      p.image(this.snakeLayer, this.xMask, this.yMask);
+      image(this.snakeLayer, this.xMask, this.yMask);
       this.snakeLayer.pop();
     }
 
@@ -383,7 +382,7 @@ void pharmacySketch = function (p) {
       }
       this.xStart -= this.xSpeed;
 
-      p.image(this.farmLayer, this.xLines, this.yLines);
+      image(this.farmLayer, this.xLines, this.yLines);
 
       this.counter += 1;
     }
@@ -391,53 +390,52 @@ void pharmacySketch = function (p) {
 
   // Hoort bij Recursion kruis
   class crossOutline {
-    public constructor(posX, posY, bigSize, smallSize, stroke) {
+    public constructor(int posX, int posY, int bigSize, int smallSize, int stroke) {
       this.x = posX;
       this.y = posY;
       this.bigSize = bigSize;
       this.smallSize = smallSize;
       this.scale = 1;
-      this.color = 0;
+      this.colour = color(0,0,0);
       this.stroke = stroke;
     }
 
-    void draw(scale, transX, transY, colour) {
-      p.push();
-      p.noFill();
-      p.strokeWeight(this.stroke);
+    void draw(float scale, float transX, float transY, color colour) {
+      push();
+      noFill();
+      strokeWeight(this.stroke);
 
-      this.color += colour;
-      p.stroke(this.color, 255, this.color);
+      this.colour += colour;
+      stroke(this.colour, 255, this.colour);
 
 
-      p.translate(this.x, this.y);
+      translate(this.x, this.y);
 
       this.scale += scale;
-      p.scale(this.scale);
+      scale(this.scale);
 
-      p.beginShape();
-      p.vertex(this.smallSize / 2, -this.bigSize / 2) // Top Right
-      p.vertex(-this.smallSize / 2, -this.bigSize / 2) // Top Left
-      p.vertex(-this.smallSize / 2, -this.smallSize / 2) // Top left corner
-      p.vertex(-this.bigSize / 2, -this.smallSize / 2) // Left top
-      p.vertex(-this.bigSize / 2, this.smallSize / 2) // Left bot
-      p.vertex(-this.smallSize / 2, this.smallSize / 2) // Bot left corner
-      p.vertex(-this.smallSize / 2, this.bigSize / 2) // Bot Left
-      p.vertex(this.smallSize / 2, this.bigSize / 2) // Bot Left
-      p.vertex(this.smallSize / 2, this.smallSize / 2) // Bot right corner
-      p.vertex(this.bigSize / 2, this.smallSize / 2) // Right bot
-      p.vertex(this.bigSize / 2, -this.smallSize / 2) // Right top
-      p.vertex(this.smallSize / 2, -this.smallSize / 2) // Top right corner
-      p.endShape(CLOSE);
-      p.pop();
+      beginShape();
+      vertex(this.smallSize / 2, -this.bigSize / 2); // Top Right
+        vertex(-this.smallSize / 2, -this.bigSize / 2); // Top Left
+        vertex(-this.smallSize / 2, -this.smallSize / 2); // Top left corner
+        vertex(-this.bigSize / 2, -this.smallSize / 2); // Left top
+        vertex(-this.bigSize / 2, this.smallSize / 2); // Left bot
+        vertex(-this.smallSize / 2, this.smallSize / 2); // Bot left corner
+        vertex(-this.smallSize / 2, this.bigSize / 2); // Bot Left
+        vertex(this.smallSize / 2, this.bigSize / 2); // Bot Left
+        vertex(this.smallSize / 2, this.smallSize / 2); // Bot right corner
+        vertex(this.bigSize / 2, this.smallSize / 2); // Right bot
+        vertex(this.bigSize / 2, -this.smallSize / 2); // Right top
+        vertex(this.smallSize / 2, -this.smallSize / 2); // Top right corner
+        endShape(CLOSE);
+      pop();
 
       this.x = this.x + this.x * transX;
       this.y += transY;
     }
 
     int getColor() {
-      return (this.color);
+      return (this.colour);
     }
   }
-
 }

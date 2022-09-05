@@ -1,61 +1,61 @@
-let vinylSketch = function (p) {
-    const black = color(0, 0, 0);
-    const white = color(255, 255, 255);
-    const DISTELXINSTANCES = 1;
-    const DISTELYINSTANCES = 1;
+class vinylSketch {
+    final static color black = color(0, 0, 0);
+    final static color white = color(255, 255, 255);
+    final static int DISTELXINSTANCES = 1;
+    final static int DISTELYINSTANCES = 1;
 
-    p.preload = function () {
-        distelRondModel = p.loadModel('assets/Distel.obj', true);
-        vinylModel = p.loadModel('assets/Vinyl_disc.obj', true);
+    preload  () {
+        distelRondModel = loadModel('assets/Distel.obj', true);
+        vinylModel = loadModel('assets/Vinyl_disc.obj', true);
     }
 
-    p.setup = function () {
-        let canvas = p.createCanvas(windowWidth, windowHeight, p.WEBGL);
+    setup  () {
+        let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
         canvas.position(0, 0);
-        p.smooth(); // Anti aliasing
-        p.frameRate(FRAMERATE);
+        smooth(); // Anti aliasing
+        frameRate(FRAMERATE);
     }
 
-    p.drawBackgroundRond = function () {
-        p.blendMode(p.BLEND);
+    drawBackgroundRond  () {
+        blendMode(BLEND);
         if (lightMode) {
-            p.background(black);
-            p.stroke(white);
+            background(black);
+            stroke(white);
         } else {
-            p.background(white);
-            p.stroke(black);
+            background(white);
+            stroke(black);
         }
     }
 
-    p.drawDistelRond = function () {
-        p.push();
-        p.translate(0, 0, 40 * lightMode);
-        p.rotateY(180 * lightMode);
-        p.emissiveMaterial(255, 0, 146);
-        p.model(distelRondModel);
-        p.pop();
+    drawDistelRond  () {
+        push();
+        translate(0, 0, 40 * lightMode);
+        rotateY(180 * lightMode);
+        emissiveMaterial(255, 0, 146);
+        model(distelRondModel);
+        pop();
     }
 
-    p.drawVinyl = function () {
-        p.push();
-        p.rotateY(90);
-        p.translate(20, 0, 0);
-        p.scale(1.5);
-        p.strokeWeight(0.5);
-        p.emissiveMaterial(0, 255, 0);
-        p.model(vinylModel);
-        p.pop();
+    drawVinyl  () {
+        push();
+        rotateY(90);
+        translate(20, 0, 0);
+        scale(1.5);
+        strokeWeight(0.5);
+        emissiveMaterial(0, 255, 0);
+        model(vinylModel);
+        pop();
     }
 
-    p.draw = function () {
-        p.drawBackgroundRond();
+    draw  () {
+        drawBackgroundRond();
 
         // Distel properties 
-        p.angleMode(p.DEGREES);
-        p.strokeWeight(1);
-        p.scale(3.5);
-        p.rotateZ(millis() / -15);
-        p.drawVinyl();
-        p.drawDistelRond();
+        angleMode(DEGREES);
+        strokeWeight(1);
+        scale(3.5);
+        rotateZ(millis() / -15);
+        drawVinyl();
+        drawDistelRond();
     }
 }
