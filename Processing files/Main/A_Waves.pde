@@ -22,25 +22,36 @@ public class Waves {
         blendMode(BLEND);
         
         // Kiezen tussen witte of zwarte achtergrond
-        if (lightMode) {
+        switch(lightMode) {
+            case 1:
                 background(255, 255, 255, wBlurWhiteMode);
                 blendMode(EXCLUSION);
-        } else {
+                break;
+            case 0:
                 background(0, 0, 0, wBlurDarkMode);
                 blendMode(SCREEN);
         }
     }
 
-    private void calcWave(float amplitude, int line, int w) {
+    private float calcDistortion(float w) {
+        switch(wDistortionType) {
+            case 0:
+                return sin(wDistortionAmount * w) * wDistortionAmount * 100;
+            case 1:
+                return sin(w * 0.0015 * TWO_PI * wDistortionAmount) * ((500 * wDistortionAmount) - 500);
+            case 2:
+                return wDistortionAmount;
+            default:
+                return wDistortionAmount;
+        }
+    }
+
+    private void calcWave(float amplitude, int line, float w) {
         // De algemene formule voor de waves, in principe een sinusgolf waarvan de hoogte wordt gemoduleerd met een sinusgolf van lagere frequentie
-        float h = amplitude * p.sin(w * 0.03 + phase * 0.07 + line * p.TWO_PI / 3) * p.pow(p.abs(p.sin(w * wFrequency + phase * 0.02)), 5);
+        float h = amplitude * sin(w * 0.03 + 1 * 0.07 + line * 6.28 / 3) * pow(Math.abs(sin(w * wFrequency + 1 * 0.02)), 5);
         
-        // Dit is een array van 3 "distortion" formules om de waves nog cooler en meer responsive te maken
-        float[] waveTypes = {
-            height / 2 + sin(wDistortionAmount * w) * wDistortionAmount * 100, 
-            height / 2 + sin(w * 0.0015 * TWO_PI * wDistortionAmount) * ((500 * wDistortionAmount) - 500),
-            height / 2 * wDistortionAmount};
-        h += waveTypes[wDistortionType];
+        // // Bereken een van de 3 "distortion" formules om de waves nog cooler en meer responsive te maken
+        h += calcDistortion(w);
         curveVertex(w, h);
     }
 
@@ -50,24 +61,30 @@ public class Waves {
         // Deze waves krijgen elk een eigen kleur uit de waveColors array
         stroke(LINECOLORS[wColorMode][line]);
         
+        
         beginShape();
-        for (int w = -20; w < width + 20; w += 5) { // Hier wordt horizontaal voor elke pixel berekend hoe hoog de wave daar moet zijn
-            calcWave(ampl, line, w);
+        for (float d = 0; d < 30; d += 1) {
+            for (float w = -20; w < width + 20; w += 5) { // Hier wordt horizontaal voor elke pixel berekend hoe hoog de wave daar moet zijn
+                calcWave(ampl, line, w);
+            }
+            translate(1, 1);
         }
         endShape();
+        
     }
 
     private void drawLines(int strokeWeight) {
         // Aantal properties voor de lines
         noFill();
-        strokeWeight(strokeWeight);
+        //strokeWeight(strokeWeight);
         
         // Dit is de code om de waves horizontaal te laten scrollen
         // Dit gebeurt door een getal om hoog te tellen
         // De hoeveelheid dat hij per frame omhoog is geteld wordt omgezet naar de hoeveelheid dat hij scrollt
         float movementDelta = wMovementCounter - this.phase;
         phase += movementDelta * 0.05;
-        
+        //scale(4);
+        //translate(0, height);
         // Hier maakt hij 3 waves (i < 3; i++)
         for (int i = 0; i < 3; i++) {
             drawWave(i);

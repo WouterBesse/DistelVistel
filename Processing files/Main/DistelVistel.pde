@@ -13,7 +13,7 @@ static final int windowHeight = 50;
 int scene = 9;
 boolean sceneChange = false;
 int createdCanvas = 0;
-boolean lightMode = true; // Bepaalt of de achtergrond wit of zwart is
+int lightMode = 0; // Bepaalt of de achtergrond wit of zwart is
 
 // Scenes
 Waves waveScene = new Waves();
@@ -29,12 +29,12 @@ NetAddress myRemoteLocation;
 //int sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6, 7];
 
 // Global Waves Vars
-boolean wColorMode = true; // 0 = kleur, 1 = monochroom
-int wBlurWhiteMode;
-int wBlurDarkMode;
-float wFrequency;
+int wColorMode = 0; // 0 = kleur, 1 = monochroom
+float wBlurWhiteMode;
+float wBlurDarkMode;
+float wFrequency = 1;
 int wMovementCounter = 1;
-float[] wFrequencyAmplitude = {1, 1, 1};
+float[] wFrequencyAmplitude = {2, 2, 2};
 float wDistortionAmount;
 int wDistortionType = 0;
 int wCrossType = 7;
@@ -57,8 +57,9 @@ float wTemp = 0;
 //}
 
 void setup() {
-  size(50, 50);
+  size(1000, 1000, P2D);
   frameRate(FRAMERATE);
+  smooth(4);
   
   
   oscP5 = new OscP5(this,7000);
@@ -74,10 +75,11 @@ void draw() {
   //} else {
   //  sceneDoms = document.getElementsByClassName("p5Canvas");
   //}
-
-  waveScene.draw();
   
-  background(0);
+  waveScene.draw();
+  println(frameRate);
+  
+  
 }
 
 // Turn osc int 1 to true and 0 to false
@@ -93,18 +95,22 @@ boolean intToBool(int maxInt) {
   }
 }
 
+// int boolToInt(boolean b) {
+//   return b.compareTo(false);
+// }
+
 void oscEvent(OscMessage msg) {
   if (msg.checkAddrPattern("/wColorMode")==true) {
-    wColorMode = intToBool(msg.get(0).intValue());
+    wColorMode = msg.get(0).intValue();
   }
   else if (msg.checkAddrPattern("/lightMode")==true) {
-    lightMode = intToBool(msg.get(0).intValue());
+    lightMode = msg.get(0).intValue();
   }
   else if (msg.checkAddrPattern("/wBlurDarkMode")==true) {
-    wBlurDarkMode = msg.get(0).intValue();
+    wBlurDarkMode = msg.get(0).floatValue();
   }
   else if (msg.checkAddrPattern("/wBlurWhiteMode")==true) {
-    wBlurWhiteMode = msg.get(0).intValue();
+    wBlurWhiteMode = msg.get(0).floatValue();
   }
   else if (msg.checkAddrPattern("/ampLo")==true) {
     wFrequencyAmplitude[0] = msg.get(0).floatValue();
