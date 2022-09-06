@@ -1,91 +1,91 @@
-void terrainSketch = function (p) {
-  static final int cols, rows;
-  static final int scl = 50;
+class terrainSketch  {
+  final static int cols, rows;
+  final static int scl = 50;
   float w = 1.8 * windowWidth;
   float h = 1.2 * windowHeight;
   float flying = 0;
-  float terrain = [];
+  float terrain []= {};
 
-  void p.setup = function () {
-    let canvas = p.createCanvas(windowWidth, windowHeight, p.WEBGL);
+  void setup  () {
+    let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
     canvas.position(0, 0);
-    p.smooth(); // Anti aliasing
-    p.frameRate(FRAMERATE);
+    smooth(); // Anti aliasing
+    frameRate(FRAMERATE);
     cols = w / scl;
     rows = h / scl;
     for (int x = 0; x < cols; x++) {
-      terrain[x] = [];
+      terrain [x] = 0;
       for (int y = 0; y < rows; y++) {
         terrain[x][y] = 0; //specify a default value for now
       }
     }
   }
 
-  void p.drawBackground = function () {
-    p.blendMode(p.BLEND);
+  void drawBackground  () {
+    blendMode(BLEND);
 
     // Kiezen tussen witte of zwarte achtergrond
     switch (lightMode) {
       case 0:
-        p.background(255, 255, 255, wBlurWhiteMode);
-        p.blendMode(p.EXCLUSION);
-        p.stroke(0, 0, 0);
+        background(255, 255, 255, wBlurWhiteMode);
+        blendMode(EXCLUSION);
+        stroke(0, 0, 0);
         break;
       case 1:
-        p.background(0, 0, 0, wBlurDarkMode);
-        p.blendMode(p.SCREEN);
-        p.stroke(255, 255, 255);
+        background(0, 0, 0, wBlurDarkMode);
+        blendMode(SCREEN);
+        stroke(255, 255, 255);
         break;
     }
   }
 
-  p.draw = function () {
-    p.push();
-    p.background(0, 0, 0);
-    p.stroke(255, 255, 255);
-    p.rotateX(PI / 3);
-    p.fill(0, 0, 0);
-    p.translate(-w / 2, -h / 2);
+  draw  () {
+    push();
+    background(0, 0, 0);
+    stroke(255, 255, 255);
+    rotateX(PI / 3);
+    fill(0, 0, 0);
+    translate(-w / 2, -h / 2);
 
     flying -= 0.1;
-    amplitude = p.map(wFrequencyAmplitude[0] / 3, 0, 1, -1, 1);
+    amplitude = map(wFrequencyAmplitude[0] / 3, 0, 1, -1, 1);
     var yoff = flying;
 
     // if (!lightMode) {
     //   let rot = 0;
     //   for (var i = 0; i < HALF_PI; i += 0.01) {
     //     rot += i;
-    //     p.rotateY(rot);
+    //     rotateY(rot);
 
     //   }
     //   rot = 0;
     // }
 
     for (var y = 0; y < rows; y++) {
-      var xoff = p.map(wFrequencyAmplitude[1], 0, 1, -0.01, 0.01);
+      var xoff = map(wFrequencyAmplitude[1], 0, 1, -0.01, 0.01);
       for (var x = 0; x < cols; x++) {
-        terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -amplitude, amplitude);
+        terrain[x][y] = map(noise(xoff, yoff), 0, 1, -amplitude, amplitude);
         xoff += 0.2;
       }
       yoff += 0.2;
     }
 
     for (var y = 0; y < rows - 1; y++) {
-      p.beginShape(TRIANGLE_STRIP);
+      beginShape(TRIANGLE_STRIP);
       for (var x = 0; x < cols; x++) {
-        p.vertex(x * scl, y * scl, terrain[x][y]);
-        p.vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+        vertex(x * scl, y * scl, terrain[x][y]);
+        vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
       }
-      p.endShape();
+      endShape();
     }
-    p.pop();
+    pop();
 
 
     /*********************************************************************** */
     /*************  UNCOMMENT BELOW TO TRY ADDING GLITCH AGAIN ************* */
     /*********************************************************************** */
 
-    // p.loadPixels();
+    // loadPixels();
 
     // // Update to the graphics buffer
     // updatePixelsGL(p);
@@ -108,7 +108,7 @@ void terrainSketch = function (p) {
     // }
 
     // if(frameCount % 60 === 0){
-    //     p.pixels.slice(0, 50) = random(255);
+    //     pixels.slice(0, 50) = random(255);
     // }
 
     // // Update the pixels

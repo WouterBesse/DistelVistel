@@ -48,7 +48,7 @@ let terrainSketch = function (p) {
     p.translate(-w / 2, -h / 2);
 
     flying -= 0.1;
-    amplitude = p.map(wFrequencyAmplitude[0] / 3, 0, 1, -1, 1);
+    amplitude = p.map(wFrequencyAmplitude[0] / 8, 0, 1, -1, 1);
     var yoff = flying;
 
     // if (!lightMode) {

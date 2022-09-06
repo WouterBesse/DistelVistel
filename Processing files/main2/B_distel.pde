@@ -1,84 +1,75 @@
-void distelSketch = function(p) {
-    static final black = color(0, 0, 0);
-    static final white = color(255, 255, 255);
-    static final SCENEID = 1;
-    static final DISTELXINSTANCES = 4;
-    static final DISTELYINSTANCES = 2;
-    int power = -DISTELYINSTANCES + 4;
-    
-    void p.preload = function() {
-        fontRegular = p.loadFont('DDCHardware-Regular.ttf');
-        distelModel = p.loadModel('assets/Distel2.obj', true);
-        distelRondModel = p.loadModel('assets/Distel.obj', true);
+class distelSketch {
+  final static color black = color(0, 0, 0);
+  final static color white = color(255, 255, 255);
+  final static int SCENEID = 1;
+  final static int DISTELXINSTANCES = 4;
+  final static int DISTELYINSTANCES = 2;
+  int power = -DISTELYINSTANCES + 4;
+
+  void preload () {
+    fontRegular = loadFont('DDCHardware-Regular.ttf');
+    distelModel = loadModel('assets/Distel2.obj', true);
+    distelRondModel = loadModel('assets/Distel.obj', true);
+  }
+
+  void setup () {
+    let canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+    canvas.position(0, 0);
+    smooth(); // Anti aliasing
+    frameRate(FRAMERATE);
+  }
+
+  void drawBackground () {
+    blendMode(ADD);
+    if (lightMode) {
+      background(black);
+      stroke(white);
+    } else {
+      background(white);
+      stroke(black);
     }
-    
-    void p.setup = function() {
-        let canvas = p.createCanvas(windowWidth, windowHeight, p.WEBGL);
-        canvas.position(0, 0);
-        p.smooth(); // Anti aliasing
-        p.frameRate(FRAMERATE);
+  }
+
+  void textRender (String tekst) {
+    textFont(fontRegular);
+    textAlign(CENTER, CENTER);
+    textSize(width / 4);
+    if (lightMode) {
+      fill(white);
+    } else {
+      fill(black);
     }
-    
-    void p.drawBackground = function() {
-        p.blendMode(p.ADD);
-        if (lightMode) {
-            p.background(black);
-            p.stroke(white);
-        } else {
-            p.background(white);
-            p.stroke(black);
-        }
+    text(tekst, 0, -height / 2);
+  }
+
+  void drawDistel () {
+    push();
+    scale((wFrequencyAmplitude[0] / 1024) * 2 / DISTELYINSTANCES);
+    model(distel);
+    pop();
+  }
+
+  void drawDistels () {
+    for (int i = 0; i < DISTELXINSTANCES; i += 1) {
+      translate(( -width / DISTELXINSTANCES), -height);
+      for (int j = 0; j < DISTELYINSTANCES; j += 1) {
+        translate(0, height / (DISTELYINSTANCES));
+        drawDistel(distelModel);
+      }
     }
-    
-    void p.textRender = function(tekst) {
-        p.textFont(fontRegular);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.textSize(p.width / 4);
-        if (lightMode) {
-            p.fill(white);
-        } else {
-            p.fill(black);
-        }
-        p.text(tekst, 0, -height / 2);
-    }
-    
-    void p.drawDistel = function(distel) {
-        p.push();
-        switch(distel) {
-            case distelModel:
-                p.scale((wFrequencyAmplitude[0] / 1024) * 2 / DISTELYINSTANCES);
-                break;
-            case distelRondModel:
-                p.rotateZ(millis() / 15);
-                p.scale(4);
-                break;
-        }
-        p.model(distel);
-        p.pop();
-    }
-    
-    void p.drawDistels = function() {
-        for (int i = 0; i < DISTELXINSTANCES; i += 1) {
-            p.translate(( -p.width / DISTELXINSTANCES), -p.height);
-            for (int j = 0; j < DISTELYINSTANCES; j += 1) {
-                p.translate(0, p.height / (DISTELYINSTANCES));
-                p.drawDistel(distelModel);
-            }
-        }
-    }
-    
-    void p.draw = function() {
-        p.drawBackground();
-        p.textRender("Distel");
-        
-        // Distel properties 
-        p.angleMode(p.DEGREES);
-        p.strokeWeight(1);
-        p.rotateY(180);
-        p.scale(0.55);
-        p.emissiveMaterial(255, 0, 146);
-        p.translate((p.width / DISTELXINSTANCES) * (DISTELXINSTANCES / 2 + 0.5), p.height / (Math.pow(DISTELYINSTANCES, power)), -300); // <------------ Moet minder beunoplossing worden
-        p.drawDistels();
-        
-    }
+  }
+
+  void draw () {
+    drawBackground();
+    textRender("Distel");
+
+    // Distel properties
+    angleMode(DEGREES);
+    strokeWeight(1);
+    rotateY(180);
+    scale(0.55);
+    emissiveMaterial(255, 0, 146);
+    translate((width / DISTELXINSTANCES) * (DISTELXINSTANCES / 2 + 0.5), height / (Math.pow(DISTELYINSTANCES, power)), -300); // <------------ Moet minder beunoplossing worden
+    drawDistels();
+  }
 }

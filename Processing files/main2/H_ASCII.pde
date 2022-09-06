@@ -1,59 +1,58 @@
-let ASCIISketch = function (p) {
+class ASCIISketch {
+  final static String density = "Ñ@#W$9876543210?!abc;:+=-,._                    ";
+  // final static density = '       .:-i|=+%O#@'
+  // final static density = '        .:░▒▓█';
+  final static int w = 64;
+  final static int h = 48;
 
-    const density = "Ñ@#W$9876543210?!abc;:+=-,._                    ";
-    // const density = '       .:-i|=+%O#@'
-    // const density = '        .:░▒▓█';
-    const w = 64;
-    const h = 48;
+  let video;
+  let frame;
 
-    let video;
-    let frame
+    void setup() {
+    canvas = createCanvas(windowWidth, windowHeight, P2D);
+    canvas.position(0, 0);
+    smooth(); // Anti aliasing
+    frameRate(FRAMERATE);
+    pixelDensity(1);
 
-    p.setup = function () {
-        canvas = p.createCanvas(windowWidth, windowHeight, p.P2D);
-        canvas.position(0, 0);
-        p.smooth(); // Anti aliasing
-        p.frameRate(FRAMERATE);
-        p.pixelDensity(1);
+    video = createCapture(VIDEO);
+    video.size(w, h);
+    //video.hide();
+  }
 
-        video = p.createCapture(VIDEO);
-        video.size(w, h);
-        //video.hide();
+  void draw  () {
+    background(0);
+    textSize(windowWidth / w);
+    textAlign(CENTER, CENTER);
+
+    image(video, 0, 0, width, width * video.height / video.width);
+    //frame = image(video, 0, 0, width, width * video.height / video.width);
+
+
+    video.loadPixels();
+
+    //console.log(frame.pixels);
+
+    for (let j = 0; j < video.height; j++) {
+      for (let i = 0; i < video.width; i++) {
+        let pixelIndex = (i + j * w) * 4;
+        let r = video.pixels[pixelIndex + 0];
+        let g = video.pixels[pixelIndex + 1];
+        let b = video.pixels[pixelIndex + 2];
+        let avg = (r + g + b) / 3;
+        //console.log(g);
+
+        noStroke();
+        fill(255);
+
+        let len = density.length;
+        let charIndex = floor(map(avg, 0, 255, 0, len));
+        //console.log(charIndex);
+
+        let c = density.charAt(charIndex);
+
+        text(c, i * w + w * 0.5, j * h + h * 0.5);
+      }
     }
-
-    p.draw = function () {
-        p.background(0);
-        p.textSize(windowWidth / w);
-        p.textAlign(CENTER, CENTER);
-
-        p.image(video, 0, 0, width, width * video.height / video.width);
-        //frame = p.image(video, 0, 0, width, width * video.height / video.width);
-
-
-        video.loadPixels();
-
-        //console.log(frame.pixels);
-
-        for (let j = 0; j < video.height; j++) {
-            for (let i = 0; i < video.width; i++) {
-                let pixelIndex = (i + j * w) * 4;
-                let r = video.pixels[pixelIndex + 0];
-                let g = video.pixels[pixelIndex + 1];
-                let b = video.pixels[pixelIndex + 2];
-                let avg = (r + g + b) / 3;
-                //console.log(g);
-
-                p.noStroke();
-                p.fill(255);
-
-                let len = density.length;
-                let charIndex = p.floor(p.map(avg, 0, 255, 0, len));
-                //console.log(charIndex);
-
-                let c = density.charAt(charIndex);
-
-                p.text(c, i * w + w * 0.5, j * h + h * 0.5);
-            }
-        }
-    }
+  }
 }

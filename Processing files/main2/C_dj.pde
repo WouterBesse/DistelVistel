@@ -1,35 +1,35 @@
-void djSketch = function(p) {
-    static final black = color(0, 0, 0);
-    static final white = color(255, 255, 255);
-    static final BLINKTHRESH = 2;
-    static final AMPTHRESH = 1024;
+class djSketch {
+    final static color black = color(0, 0, 0);
+    final static color white = color(255, 255, 255);
+    final static float BLINKTHRESH = 2;
+    final static int AMPTHRESH = 1024;
     let canvas;
     
-    void p.preload = function() {
-        buurModel = p.loadModel('assets/BUUR.obj', true);
-        koshModel = p.loadModel('assets/KOSH.obj', true);
-        ureModel = p.loadModel('assets/URE.obj', true);
+    void preload () {
+        buurModel = loadModel('assets/BUUR.obj', true);
+        koshModel = loadModel('assets/KOSH.obj', true);
+        ureModel = loadModel('assets/URE.obj', true);
     }
     
-    void p.setup = function() {
-        canvas = p.createCanvas(windowWidth, windowHeight, p.WEBGL);
+    void setup () {
+        canvas = createCanvas(windowWidth, windowHeight, WEBGL);
         canvas.position(0, 0);
-        textLayer = p.createGraphics(windowWidth, windowHeight, p.P2D)
-            p.smooth(); // Anti aliasing
-        p.frameRate(FRAMERATE);
+        textLayer = createGraphics(windowWidth, windowHeight, P2D);
+        smooth(); // Anti aliasing
+        frameRate(FRAMERATE);
     }
     
-    void p.drawBackground = function() {
+    void drawBackground () {
         if (lightMode) {
-            p.background(black);
-            p.stroke(white);
+            background(black);
+            stroke(white);
         } else {
-            p.background(white);
-            p.stroke(black);
+            background(white);
+            stroke(black);
         }
     }
     
-    void p.chooseDJ = function() {
+    void chooseDJ () {
         switch(scene) {
             case 2 : // BUUR
                 return(buurModel);
@@ -45,21 +45,21 @@ void djSketch = function(p) {
         }
     }
     
-    void p.draw = function() {
-        let dj = p.chooseDJ();
-        p.drawBackground();
+    void draw () {
+        let dj = chooseDJ();
+        drawBackground();
         
-        float constrained = p.constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
-        p.ortho();
-        p.angleMode(p.DEGREES);
+        float constrained = constrain(wFrequencyAmplitude[0] / AMPTHRESH, 1, 2);
+        ortho();
+        angleMode(DEGREES);
         
-        p.push();
-        p.strokeWeight(2);
-        p.rotateX(180);
-        p.scale(4);
-        p.scale(constrained, 1);
-        p.emissiveMaterial(255, 0, 146);
-        p.model(dj);
-        p.pop();
+        push();
+        strokeWeight(2);
+        rotateX(180);
+        scale(4);
+        scale(constrained, 1);
+        emissiveMaterial(255, 0, 146);
+        model(dj);
+        pop();
     }
 }
