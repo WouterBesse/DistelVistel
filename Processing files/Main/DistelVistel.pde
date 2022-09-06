@@ -1,166 +1,162 @@
 import processing.net.*;
 import processing.serial.*;
+import oscP5.*;
+import netP5.*;
 
 // Global Vars
 static final int NUMOFSCENES = 8;
 static final boolean VERBOSE = false;
 static final int FRAMERATE = 60;
-static final int windowWidth = window.innerWidth;
-static final int windowHeight = window.innerHeight;
+static final int windowWidth = 50;
+static final int windowHeight = 50;
 
 int scene = 9;
 boolean sceneChange = false;
 int createdCanvas = 0;
-boolean lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
+boolean lightMode = true; // Bepaalt of de achtergrond wit of zwart is
 
-let sceneDoms;
-let scenes[];
-int sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6, 7];
+// Scenes
+Waves waveScene = new Waves();
+
+// OSC Vars
+OscP5 oscP5;
+NetAddress myRemoteLocation;
+
+
+
+//let sceneDoms;
+//let scenes[];
+//int sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6, 7];
 
 // Global Waves Vars
-boolean wColorMode = 0; // 0 = kleur, 1 = monochroom
-let wBlurWhiteMode;
-let wBlurDarkMode;
-let wFrequency;
-let wMovementCounter = 1;
-float wFrequencyAmplitude = [1, 1, 1];
+boolean wColorMode = true; // 0 = kleur, 1 = monochroom
+int wBlurWhiteMode;
+int wBlurDarkMode;
+float wFrequency;
+int wMovementCounter = 1;
+float[] wFrequencyAmplitude = {1, 1, 1};
 float wDistortionAmount;
 int wDistortionType = 0;
 int wCrossType = 7;
 int wShapeType = 0;
-boolean wMaterial = 0;
+boolean wMaterial = true;
 float wTemp = 0;
 
-void function preload() {
-  scenes = [ // set Scenes
-    new processing(waveSketch),
-    new processing(distelSketch),
-    new processing(djSketch),
-    new processing(pharmacySketch),
-    new processing(terrainSketch),
-    new processing(vinylSketch),
-    new processing(shapeSketch),
-    new processing(ASCIISketch)
-  ];
-  sceneDoms = document.getElementsByClassName("p5Canvas");
-}
+//void function preload() {
+//  scenes = [ // set Scenes
+//    new processing(waveSketch),
+//    new processing(distelSketch),
+//    new processing(djSketch),
+//    new processing(pharmacySketch),
+//    new processing(terrainSketch),
+//    new processing(vinylSketch),
+//    new processing(shapeSketch),
+//    new processing(ASCIISketch)
+//  ];
+//  sceneDoms = document.getElementsByClassName("p5Canvas");
+//}
 
-void function setup() {
+void setup() {
+  size(50, 50);
   frameRate(FRAMERATE);
-
-  //maak een connect-object aan dat zorgt voor de communicatie met oscServer.js
-  connect = new Connect();
-
-  //maak verbinding met oscServer.js, en voor code tussen {} uit zodra deze verbinding tot stand is gekomen.
-  connect.connectToServer(function () {
-    //maak een nieuw server-object aan.
-    server = new Server();
-
-    //start de server en zorg dat deze gaat luisteren naar poort 7000
-    server.startServer(7000);
-
-    //als de server een bericht ontvangt voert deze de functie oscReceiver uit en geeft deze twee argumenten mee: address en msg.
-    server.getMessage(function (address, msg) {
-      oscReceiver(address, msg);
-    });
-  });
-}
-
-void function waveVerbose() {
-  static final SCENEID = 0;
-  if (VERBOSE) {
-    console.group("Wave Variables");
-    console.debug("wColorMode: ", wColorMode);
-    console.debug("lightMode: ", lightMode);
-    console.debug("wBlurDarkMode: ", wBlurDarkMode);
-    console.debug("wBlurWhiteMode: ", wBlurWhiteMode);
-    console.debug("wFrequencyAmplitude: ", wFrequencyAmplitude);
-    console.debug("wFrequency: ", wFrequency);
-    console.debug("wMovementCounter: ", wMovementCounter);
-    console.debug("wDistortionAmount: ", wDistortionAmount);
-    console.debug("wDistortionType: ", wDistortionType);
-    console.groupEnd();
-  }
+  
+  
+  oscP5 = new OscP5(this,7000);
+  myRemoteLocation = new NetAddress("127.0.0.1",7000);
+  
 }
 
 // Ontvang de osc messages
-void function oscReceiver(address, msg) {
-  //als de variabele address gelijk is aan /y wordt de code tussen de {} uitegevoerd
-  switch (address) {
-    case "/wColorMode":
-      wColorMode = msg;
-      break;
-    case "/lightMode":
-      lightMode = msg;
-      break;
-    case "/wBlurDarkMode":
-      wBlurDarkMode = msg;
-      break;
-    case "/wBlurWhiteMode":
-      wBlurWhiteMode = msg;
-      break;
-    case "/ampLo":
-      wFrequencyAmplitude[0] = msg;
-      break;
-    case "/ampMid":
-      wFrequencyAmplitude[1] = msg;
-      break;
-    case "/ampHi":
-      wFrequencyAmplitude[2] = msg;
-      break;
-    case "/wFrequency":
-      wFrequency = msg;
-      break;
-    case "/wMovementCounter":
-      wMovementCounter = msg;
-      break;
-    case "/wDistortionAmount":
-      wDistortionAmount = msg;
-      break;
-    case "/wDistortionType":
-      wDistortionType = msg;
-      break;
-    case "/scene":
-      scene = msg;
-      sceneChange = true;
-      break;
-    case "/wCrossType":
-      wCrossType = msg;
-      break;
-    case "/wShapeType":
-      wShapeType = msg;
-      break;
-    case "/wMaterial":
-      wMaterial = msg;
-      break;
-    case "/wTemp":
-      wTemp = msg;
-      break;
-    case "/crossRecursionX":
-      crossRecursionX = msg;
-      break;
+void draw() {
+  //console.log(sceneDoms.length);
+  //if (sceneDoms.length >= NUMOFSCENES + 1) {
+  //  setScene(sceneAllocations[scene]);
+  //} else {
+  //  sceneDoms = document.getElementsByClassName("p5Canvas");
+  //}
+
+  waveScene.draw();
+  
+  background(0);
+}
+
+// Turn osc int 1 to true and 0 to false
+boolean intToBool(int maxInt) {
+  switch(maxInt) {
+    case 0:
+      return false;
+    case 1:
+      return true;
+    default:
+      print("intToBool() error: input is not 1 or 0");
+      return false;
   }
+}
+
+void oscEvent(OscMessage msg) {
+  if (msg.checkAddrPattern("/wColorMode")==true) {
+    wColorMode = intToBool(msg.get(0).intValue());
+  }
+  else if (msg.checkAddrPattern("/lightMode")==true) {
+    lightMode = intToBool(msg.get(0).intValue());
+  }
+  else if (msg.checkAddrPattern("/wBlurDarkMode")==true) {
+    wBlurDarkMode = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/wBlurWhiteMode")==true) {
+    wBlurWhiteMode = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/ampLo")==true) {
+    wFrequencyAmplitude[0] = msg.get(0).floatValue();
+  }
+  else if (msg.checkAddrPattern("/ampMid")==true) {
+    wFrequencyAmplitude[1] = msg.get(0).floatValue();
+  }
+  else if (msg.checkAddrPattern("/ampHi")==true) {
+    wFrequencyAmplitude[2] = msg.get(0).floatValue();
+  }
+  else if (msg.checkAddrPattern("/wFrequency")==true) {
+    wFrequency = msg.get(0).floatValue();
+  }
+  else if (msg.checkAddrPattern("/wMovementCounter")==true) {
+    wMovementCounter = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/wDistortionAmount")==true) {
+    wDistortionAmount = msg.get(0).floatValue();
+  }
+  else if (msg.checkAddrPattern("/wDistortionType")==true) {
+    wDistortionType = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/scene")==true) {
+    scene = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/wCrossType")==true) {
+    wCrossType = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/wShapeType")==true) {
+    wShapeType = msg.get(0).intValue();
+  }
+  else if (msg.checkAddrPattern("/wMaterial")==true) {
+    wMaterial = intToBool(msg.get(0).intValue());
+  }
+  else if (msg.checkAddrPattern("/wTemp")==true) {
+    wTemp = msg.get(0).floatValue();
+  }
+  // else if (msg.checkAddrPattern("/crossRecursionX")==true) {
+  //   wTemp = msg.get(0).floatValue();
+  // }
 }
 
 // Draw scenes
-void function setScene(newScene) {
-  for (s = 0; s < scenes.length; s++) {
-    switch (s) {
-      case newScene:
-        scenes[s].loop();
-        break;
-      default:
-        scenes[s].noLoop();
-        scenes[s].clear();
-    }
-  }
-}
-
-void function draw() {
-  //console.log(sceneDoms.length);
-  if (sceneDoms.length >= NUMOFSCENES + 1) {
-    setScene(sceneAllocations[scene]);
-  } else {
-    sceneDoms = document.getElementsByClassName("p5Canvas");
-  }
-}
+//void function setScene(newScene) {
+//  for (s = 0; s < scenes.length; s++) {
+//    switch (s) {
+//      case newScene:
+//        scenes[s].loop();
+//        break;
+//      default:
+//        scenes[s].noLoop();
+//        scenes[s].clear();
+//    }
+//  }
+//}
