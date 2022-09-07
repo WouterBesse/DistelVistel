@@ -7,8 +7,8 @@ import netP5.*;
 static final int NUMOFSCENES = 8;
 static final boolean VERBOSE = false;
 static final int FRAMERATE = 60;
-static final int windowWidth = 50;
-static final int windowHeight = 50;
+int CUSTOMWIDTH = 1000;
+int CUSTOMHEIGHT = 1000;
 
 int scene = 9;
 boolean sceneChange = false;
@@ -17,6 +17,7 @@ int lightMode = 0; // Bepaalt of de achtergrond wit of zwart is
 
 // Scenes
 Waves waveScene = new Waves();
+Distels distelScene = new Distels();
 
 // OSC Vars
 OscP5 oscP5;
@@ -56,6 +57,10 @@ float wTemp = 0;
 //  sceneDoms = document.getElementsByClassName("p5Canvas");
 //}
 
+void preload() {
+  distelScene.preload();
+}
+
 void setup() {
   size(1000, 1000, P2D);
   frameRate(FRAMERATE);
@@ -64,6 +69,10 @@ void setup() {
   
   oscP5 = new OscP5(this,7000);
   myRemoteLocation = new NetAddress("127.0.0.1",7000);
+  
+  distelScene.setup();
+  distelScene.initiateDraw();
+  
   
 }
 
@@ -76,8 +85,9 @@ void draw() {
   //  sceneDoms = document.getElementsByClassName("p5Canvas");
   //}
   
-  waveScene.draw();
-  println(frameRate);
+  distelScene.draw();
+  //waveScene.draw();
+  //println(frameRate);
   
   
 }

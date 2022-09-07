@@ -1,4 +1,4 @@
-public class Waves {
+class Waves {
     private color[][] LINECOLORS = {
     {
         color(255, 0, 0),
@@ -22,7 +22,7 @@ public class Waves {
         blendMode(BLEND);
         
         // Kiezen tussen witte of zwarte achtergrond
-        switch(lightMode) {
+        switch (lightMode) {
             case 1:
                 background(255, 255, 255, wBlurWhiteMode);
                 blendMode(EXCLUSION);
@@ -93,8 +93,8 @@ public class Waves {
 
     public void draw() {
         drawBackground();
-        push();
+        pushMatrix();
         drawLines(20);
-        pop();
+        popMatrix();
     }
 }
