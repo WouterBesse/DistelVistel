@@ -418,7 +418,7 @@ let pharmacySketch = function (p) {
       p.strokeWeight(this.stroke);
 
       this.color += colour;
-      if(this.x > this.posX - 100 || this.x < this.posX + 100 || this.y > this.posY - 100 || this.y < this.posY + 100) {
+      if(this.x > this.posX * -2 || this.x < this.posX * 2 || this.y > this.posY * -2 || this.y < this.posY * 2) {
         p.stroke(this.color, 255, this.color);
       } else {
         p.stroke(0, 0, 0, 0);

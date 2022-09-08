@@ -120,16 +120,23 @@ let flowFieldSketch = function (p) {
                     this.updatePrev();
                 }
             };
+            this.done = function () {
+                return false;
+            }
         }
     }
 
     class fireParticle {
         constructor(x, y, hu, firework) {
             this.pos = p.createVector(x, y);
+            this.prevPos = this.pos.copy();
             this.firework = firework;
-            this.lifespan = 255;
+            this.lifespan = 512;
+            this.doner = false;
             this.hu = hu;
+            this.slice = p.int(p.random(numberOfSlices)) * sliceDistance;
             this.acc = p.createVector(0, 0);
+            
             if (this.firework) {
                 this.vel = p.createVector(0, 0);
                 //p.random(-12, -8));
@@ -137,6 +144,60 @@ let flowFieldSketch = function (p) {
                 this.vel = p5.Vector.random2D();
                 this.vel.mult(p.random(2, 10));
             }
+
+            this.calculateForce = function () {
+                if (!this.doner) {
+                    var force = p.calculateForce(this.pos.x, this.pos.y, this.slice);
+        
+                    this.setHue(force * hueMultiplier);
+        
+                    var vector = p5.Vector.fromAngle(force * accMultiplier);
+                    this.acc.add(vector.mult(0.0005 * (513 - this.lifespan)));
+                }
+            };
+
+            this.updatePrev = function () {
+                this.prevPos.x = this.pos.x;
+                this.prevPos.y = this.pos.y;
+            };
+
+            this.edges = function () {
+                if (this.pos.x > windowWidth || this.pos.x < 0 ||
+                    this.pos.y > windowHeight || this.pos.y < 0) {
+                    this.pos = p.createVector(random(windowWidth), random(windowHeight));
+                    this.vel = p.createVector(0, 0);
+                    this.updatePrev();
+                }
+            };
+
+            this.setHue = function (force) {
+                if (force > 255) {
+                    this.hue = force % 256;
+                } else {
+                    this.hue = force;
+                }
+                p.stroke(this.hue, 255, 255, visibility);
+                p.strokeWeight(3);
+            };
+
+            this.show = function () {
+                if(!this.doner) {
+                    p.colorMode(HSB);
+
+                    if (!this.firework) {
+                        p.strokeWeight(2);
+                        p.stroke(this.hu, 255, 255, this.lifespan);
+                    } else {
+                        p.strokeWeight(4);
+                        p.stroke(this.hu, 255, 255);
+                    }
+
+                    p.circle(this.pos.x, this.pos.y, 4)
+                    p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+                    this.updatePrev();
+                }
+            };
+            
         }
 
         applyForce(force) {
@@ -149,30 +210,20 @@ let flowFieldSketch = function (p) {
                 this.lifespan -= 4;
             }
             this.vel.add(this.acc);
+            this.vel.limit(maxspeed);
             this.pos.add(this.vel);
             this.acc.mult(0);
+
+            
         }
 
         done() {
             if (this.lifespan < 0) {
+                this.doner = true;
                 return true;
             } else {
                 return false;
             }
-        }
-
-        show() {
-            p.colorMode(HSB);
-
-            if (!this.firework) {
-                p.strokeWeight(2);
-                p.stroke(this.hu, 255, 255, this.lifespan);
-            } else {
-                p.strokeWeight(4);
-                p.stroke(this.hu, 255, 255);
-            }
-
-            p.circle(this.pos.x, this.pos.y, 4)
         }
     }
 
@@ -186,6 +237,13 @@ let flowFieldSketch = function (p) {
 
         done() {
             if (this.exploded && this.particles.length === 0) {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    this.particles[i].update();
+    
+                    if (this.particles[i].done()) {
+                        this.particles.splice(i, 1);
+                    }
+                }
                 return true;
             } else {
                 return false;
@@ -228,6 +286,10 @@ let flowFieldSketch = function (p) {
             for (var i = 0; i < this.particles.length; i++) {
                 this.particles[i].show();
             }
+        }
+
+        getParticles() {
+            return this.particles;
         }
     }
 
@@ -283,12 +345,25 @@ let flowFieldSketch = function (p) {
         }
 
         for (let i = fireworks.length - 1; i >= 0; i--) {
+            if(fireworks[i]!= undefined) {
+                for (let e = 0; e < fireworks[i].particles.length; e++) {
+                    particles.unshift(fireworks[i].particles[e]);
+                }
+            }
+
             fireworks[i].update();
             fireworks[i].show();
 
             if (fireworks[i].done()) {
+                // for (var f = 0; f < particles.length; f++) {
+                //     if (particles[f].done()) {
+                //         particles.splice(f, 1);
+                //     }
+                // }
                 fireworks.splice(i, 1);
             }
+
+            
         }
 
     }
@@ -307,6 +382,11 @@ let flowFieldSketch = function (p) {
         num = p.min(num, particles.length);
         for (var i = 0; i < num; i++) {
             particles.pop();
+        }
+        for (var f = 0; f < particles.length; f++) {
+            if (particles[f].done()) {
+                particles.splice(f, 1);
+            }
         }
     }
     p.setParticles = function (num) {
