@@ -5,7 +5,7 @@ const FRAMERATE = 60;
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-let scene = 10;
+let scene = 1;
 let sceneChange = false;
 let createdCanvas = 0;
 let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is

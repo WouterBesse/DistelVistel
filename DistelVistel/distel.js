@@ -4,6 +4,8 @@ let distelSketch = function (p) {
   const SCENEID = 1;
   const DISTELXINSTANCES = 4;
   const DISTELYINSTANCES = 2;
+  let DistelXMargin;
+  let DistelYMargin;
   let power = -DISTELYINSTANCES + 4;
 
   p.preload = function () {
@@ -17,6 +19,10 @@ let distelSketch = function (p) {
     canvas.position(0, 0);
     p.smooth(); // Anti aliasing
     p.frameRate(FRAMERATE);
+
+    DistelXMargin = p.width/DISTELXINSTANCES;
+    DistelYMargin = p.height/DISTELYINSTANCES;
+
   }
 
   p.drawBackground = function () {
@@ -42,8 +48,9 @@ let distelSketch = function (p) {
     p.text(tekst, 0, -height / 2);
   }
 
-  p.drawDistel = function (distel) {
+  p.drawDistel = function (distel, distelX, distelY) {
     p.push();
+    p.translate(distelX, distelY);
     switch (distel) {
       case distelModel:
         p.scale(2*((wFrequencyAmplitude[0] / 1024) * 2 / DISTELYINSTANCES));
@@ -59,10 +66,10 @@ let distelSketch = function (p) {
 
   p.drawDistels = function () {
     for (var i = 0; i < DISTELXINSTANCES; i += 1) {
-      p.translate((-p.width / DISTELXINSTANCES), -p.height);
       for (var j = 0; j < DISTELYINSTANCES; j += 1) {
-        p.translate(0, p.height / (DISTELYINSTANCES));
-        p.drawDistel(distelModel);
+        let distelX = i * DistelXMargin - DistelXMargin * 1.5;
+        let distelY = j * DistelYMargin - DistelYMargin/2;
+        p.drawDistel(distelModel, distelX, distelY);
       }
     }
   }
@@ -75,9 +82,8 @@ let distelSketch = function (p) {
     p.angleMode(p.DEGREES);
     p.strokeWeight(1);
     p.rotateY(180);
-    p.scale(0.55);
+    p.scale(0.85);
     p.emissiveMaterial(255, 0, 146);
-    p.translate((p.width / DISTELXINSTANCES) * (DISTELXINSTANCES / 2 + 0.5), p.height / (Math.pow(DISTELYINSTANCES, power)), -300); // <------------ Moet minder beunoplossing worden
     p.drawDistels();
 
   }
