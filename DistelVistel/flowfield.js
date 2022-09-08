@@ -5,7 +5,6 @@ let flowFieldSketch = function (p) {
     let canvas;
     const fireworks = [];
     let gravity;
-    const letters = ['D', 'I', 'S', 'T', 'E', 'L'];
     let div = 0;
 
 
@@ -65,231 +64,152 @@ let flowFieldSketch = function (p) {
     }
 
     class Particle {
-        constructor() {
-            this.pos = p.createVector(p.random(windowWidth), p.random(windowHeight));
+        constructor(x = p.random(windowWidth), y = p.random(windowHeight), hue = 0,) {
+            this.pos = p.createVector(x, y);
             this.vel = p.createVector(0, 0);
             this.acc = p.createVector(0, 0);
-            this.hue = 0; // hue
-
+            this.hue = hue; // hue
             this.slice = p.int(p.random(numberOfSlices)) * sliceDistance;
-
             this.prevPos = this.pos.copy();
-
-
-            this.update = function () {
-                this.vel.add(this.acc);
-                this.vel.limit(maxspeed);
-                this.pos.add(this.vel);
-                this.acc.mult(0);
-            };
-
-            this.applyForce = function (force) {
-                this.acc.add(force);
-            };
-            this.calculateForce = function () {
-                var force = p.calculateForce(this.pos.x, this.pos.y, this.slice);
-
-                this.setHue(force * hueMultiplier);
-
-                var vector = p5.Vector.fromAngle(force * accMultiplier);
-
-                this.acc.add(vector);
-            };
-            this.setHue = function (force) {
-                if (force > 255) {
-                    this.hue = force % 256;
-                } else {
-                    this.hue = force;
-                }
-                p.stroke(this.hue, 255, 255, visibility);
-                p.strokeWeight(3);
-            };
-            this.show = function () {
-                p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
-                this.updatePrev();
-            };
-            this.updatePrev = function () {
-                this.prevPos.x = this.pos.x;
-                this.prevPos.y = this.pos.y;
-            };
-            this.edges = function () {
-                if (this.pos.x > windowWidth || this.pos.x < 0 ||
-                    this.pos.y > windowHeight || this.pos.y < 0) {
-                    this.pos = p.createVector(random(windowWidth), random(windowHeight));
-                    this.vel = p.createVector(0, 0);
-                    this.updatePrev();
-                }
-            };
-            this.done = function () {
-                return false;
-            }
-        }
-    }
-
-    class fireParticle {
-        constructor(x, y, hu, firework) {
-            this.pos = p.createVector(x, y);
-            this.prevPos = this.pos.copy();
-            this.firework = firework;
-            this.lifespan = 512;
-            this.doner = false;
-            this.hu = hu;
-            this.slice = p.int(p.random(numberOfSlices)) * sliceDistance;
-            this.acc = p.createVector(0, 0);
-            
-            if (this.firework) {
-                this.vel = p.createVector(0, 0);
-                //p.random(-12, -8));
-            } else {
-                this.vel = p5.Vector.random2D();
-                this.vel.mult(p.random(2, 10));
-            }
-
-            this.calculateForce = function () {
-                if (!this.doner) {
-                    var force = p.calculateForce(this.pos.x, this.pos.y, this.slice);
-        
-                    this.setHue(force * hueMultiplier);
-        
-                    var vector = p5.Vector.fromAngle(force * accMultiplier);
-                    this.acc.add(vector.mult(0.0005 * (513 - this.lifespan)));
-                }
-            };
-
-            this.updatePrev = function () {
-                this.prevPos.x = this.pos.x;
-                this.prevPos.y = this.pos.y;
-            };
-
-            this.edges = function () {
-                if (this.pos.x > windowWidth || this.pos.x < 0 ||
-                    this.pos.y > windowHeight || this.pos.y < 0) {
-                    this.pos = p.createVector(random(windowWidth), random(windowHeight));
-                    this.vel = p.createVector(0, 0);
-                    this.updatePrev();
-                }
-            };
-
-            this.setHue = function (force) {
-                if (force > 255) {
-                    this.hue = force % 256;
-                } else {
-                    this.hue = force;
-                }
-                p.stroke(this.hue, 255, 255, visibility);
-                p.strokeWeight(3);
-            };
-
-            this.show = function () {
-                if(!this.doner) {
-                    p.colorMode(HSB);
-
-                    if (!this.firework) {
-                        p.strokeWeight(2);
-                        p.stroke(this.hu, 255, 255, this.lifespan);
-                    } else {
-                        p.strokeWeight(4);
-                        p.stroke(this.hu, 255, 255);
-                    }
-
-                    p.circle(this.pos.x, this.pos.y, 4)
-                    p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
-                    this.updatePrev();
-                }
-            };
-            
-        }
-
-        applyForce(force) {
-            this.acc.add(force);
         }
 
         update() {
-            if (!this.firework) {
-                this.vel.mult(0.9);
-                this.lifespan -= 4;
-            }
             this.vel.add(this.acc);
             this.vel.limit(maxspeed);
             this.pos.add(this.vel);
             this.acc.mult(0);
+        };
 
-            
+        applyForce(force) {
+            this.acc.add(force);
+        };
+
+        calculateForce() {
+            var force = p.calculateForce(this.pos.x, this.pos.y, this.slice);
+
+            this.setHue(force * hueMultiplier);
+
+            var vector = p5.Vector.fromAngle(force * accMultiplier);
+
+            this.acc.add(vector.mult(this.forceMult()));
+        };
+
+        setHue(force) {
+            if (force > 255) {
+                this.hue = force % 256;
+            } else {
+                this.hue = force;
+            }
+            p.stroke(this.hue, 255, 255, visibility);
+            p.strokeWeight(3);
+        };
+
+        show() {
+            p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+            this.updatePrev();
+        };
+
+        updatePrev() {
+            this.prevPos.x = this.pos.x;
+            this.prevPos.y = this.pos.y;
+        };
+
+        edges() {
+            if (this.pos.x > windowWidth || this.pos.x < 0 ||
+                this.pos.y > windowHeight || this.pos.y < 0) {
+                this.pos = p.createVector(random(windowWidth), random(windowHeight));
+                this.vel = p.createVector(0, 0);
+                this.updatePrev();
+            }
+        };
+
+        forceMult() {
+            return 1;
+        };
+    }
+
+    class fireParticle extends Particle {
+        constructor(x, y, hue) {
+            super(x, y, hue);
+            this.velocityInfluence = 512;
+            this.vel = p5.Vector.random2D();
+            this.vel.mult(p.random(2, 10));
         }
 
-        done() {
-            if (this.lifespan < 0) {
-                this.doner = true;
-                return true;
-            } else {
-                return false;
-            }
+        update() {
+            this.vel.mult(0.9);
+            this.lifespan -= 4;
+            this.vel.add(this.acc);
+            this.vel.limit(maxspeed);
+            this.pos.add(this.vel);
+            this.acc.mult(0);
+        }
+
+        show(opacity) {
+            p.colorMode(HSB);
+
+            
+            p.strokeWeight(2);
+            p.stroke(this.hue, 255, 255, opacity);
+            
+
+            p.circle(this.pos.x, this.pos.y, 4)
+            p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+            this.updatePrev();
+        }
+
+        forceMult() {
+            this.velocityInfluence += -4;
+            return 0.0005 * (513 - this.velocityInfluence);
         }
     }
 
     class Firework {
         constructor() {
-            this.hu = p.random(255);
-            this.firework = new fireParticle(p.random(windowWidth), p.random(windowHeight), this.hu, true);
+            this.hue = p.random(255);
+            this.x = p.random(windowWidth);
+            this.y = p.random(windowHeight);
             this.exploded = false;
             this.particles = [];
+            this.lifespan = 512;
+            this.doner = false;
         }
 
         done() {
-            if (this.exploded && this.particles.length === 0) {
-                for (let i = this.particles.length - 1; i >= 0; i--) {
-                    this.particles[i].update();
-    
-                    if (this.particles[i].done()) {
-                        this.particles.splice(i, 1);
-                    }
+            if (this.lifespan <= 0) {
+                for (let i = 0; i < this.particles.length; i++) {
+                    
+                    this.particles.splice(i, 1);
+                    
                 }
-                return true;
-            } else {
-                return false;
+                this.doner = true;
             }
         }
 
         update() {
-            if (!this.exploded) {
-                this.firework.applyForce(gravity);
-                this.firework.update();
-
-                if (this.firework.vel.y >= 0) {
-                    this.exploded = true;
-                    this.explode();
-                }
-            }
-
             for (let i = this.particles.length - 1; i >= 0; i--) {
                 this.particles[i].applyForce(gravity);
                 this.particles[i].update();
-
-                if (this.particles[i].done()) {
-                    this.particles.splice(i, 1);
-                }
             }
+            this.done();
+            this.lifespan += -4;
         }
 
         explode() {
             for (let i = 0; i < 100; i++) {
-                const p = new fireParticle(this.firework.pos.x, this.firework.pos.y, this.hu, false);
+                const p = new fireParticle(this.x, this.y, this.hue, false);
                 this.particles.push(p);
             }
         }
 
         show() {
-            if (!this.exploded) {
-                this.firework.show();
-            }
-
             for (var i = 0; i < this.particles.length; i++) {
-                this.particles[i].show();
+                this.particles[i].show(this.lifespan/2);
             }
         }
 
-        getParticles() {
-            return this.particles;
+        splicePart(k) {
+            particles.splice(k, 1);
         }
     }
 
@@ -300,10 +220,10 @@ let flowFieldSketch = function (p) {
             zMove = p.random();
         } else {
             if (!lightMode && !manual) {
-                if(div==10){
+                if (div == 10) {
                     xMove = p.random();
                     yMove = p.random();
-                    zMove = p.random(); 
+                    zMove = p.random();
                     div = 0;
                 } else {
                     div++;
@@ -341,29 +261,29 @@ let flowFieldSketch = function (p) {
         }
 
         if (p.random(1) < 0.04) {
-            fireworks.push(new Firework());
+            f = new Firework();
+            f.explode();
+            fireworks.push(f);
         }
 
         for (let i = fireworks.length - 1; i >= 0; i--) {
-            if(fireworks[i]!= undefined) {
-                for (let e = 0; e < fireworks[i].particles.length; e++) {
-                    particles.unshift(fireworks[i].particles[e]);
-                }
+            for (var k = 0; k < fireworks[i].particles.length; k++) {
+                fireworks[i].particles[k].calculateForce();  // calculate force from noise field
+                // will also set hue
+                fireworks[i].particles[k].edges();           // check if still in bounds
             }
 
             fireworks[i].update();
             fireworks[i].show();
 
-            if (fireworks[i].done()) {
-                // for (var f = 0; f < particles.length; f++) {
-                //     if (particles[f].done()) {
-                //         particles.splice(f, 1);
-                //     }
-                // }
+            if (fireworks[i].doner) {
+                for (var k = 0; k < fireworks[i].particles.length; k++) {
+                    fireworks[i].splicePart(k);
+                }
                 fireworks.splice(i, 1);
             }
 
-            
+
         }
 
     }
@@ -382,11 +302,6 @@ let flowFieldSketch = function (p) {
         num = p.min(num, particles.length);
         for (var i = 0; i < num; i++) {
             particles.pop();
-        }
-        for (var f = 0; f < particles.length; f++) {
-            if (particles[f].done()) {
-                particles.splice(f, 1);
-            }
         }
     }
     p.setParticles = function (num) {
