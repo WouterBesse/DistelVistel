@@ -1,5 +1,5 @@
 let pharmacySketch = function (p) {
-  const CROSSAMOUNT = 1;
+  const CROSSAMOUNT = 2;
   const CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
   let fontRegular;
@@ -136,6 +136,8 @@ let pharmacySketch = function (p) {
       this.scrollSize = this.bigSize * 2;
       this.textSize = this.bigSize / 5;
       this.farmLayer.textFont(fontRegular);
+
+      this.pink = color(255, 0, 146);
     }
 
     // For all crosses
@@ -188,7 +190,9 @@ let pharmacySketch = function (p) {
 
     makeCrossMask() {
       this.maskLayer.background(0);
+      
       this.maskLayer.rectMode(p.CENTER);
+      
 
       this.maskLayer.erase();
       this.maskLayer.rect(this.maskSize / 2, this.maskSize / 2, this.bigSize, this.smallSize);
@@ -201,26 +205,26 @@ let pharmacySketch = function (p) {
       // Create outline <---------------------------------------------------------------- Willen we dit? Staat beter bij temperatuur, snake, farmacia en 
       //                                                                                  flashes, maar maakt de illusie minder bij de andere kruizen. 
       //                                                                                  Miss sws even naar de kleuren kijken 
-      p.push();
-      p.translate(windowWidth / 2, windowHeight / 2);
-      p.stroke(255, 0, 0);
-      p.noFill();
-      p.strokeWeight(5);
-      p.beginShape();
-      p.vertex(this.smallSize / 2, -this.bigSize / 2) // Top Right
-      p.vertex(-this.smallSize / 2, -this.bigSize / 2) // Top Left
-      p.vertex(-this.smallSize / 2, -this.smallSize / 2) // Top left corner
-      p.vertex(-this.bigSize / 2, -this.smallSize / 2) // Left top
-      p.vertex(-this.bigSize / 2, this.smallSize / 2) // Left bot
-      p.vertex(-this.smallSize / 2, this.smallSize / 2) // Bot left corner
-      p.vertex(-this.smallSize / 2, this.bigSize / 2) // Bot Left
-      p.vertex(this.smallSize / 2, this.bigSize / 2) // Bot Left
-      p.vertex(this.smallSize / 2, this.smallSize / 2) // Bot right corner
-      p.vertex(this.bigSize / 2, this.smallSize / 2) // Right bot
-      p.vertex(this.bigSize / 2, -this.smallSize / 2) // Right top
-      p.vertex(this.smallSize / 2, -this.smallSize / 2) // Top right corner
-      p.endShape(CLOSE);
-      p.pop();
+      // p.push();
+      // p.translate(windowWidth / 2, windowHeight / 2);
+      // //p.stroke(this.pink);
+      // p.noFill();
+      // p.strokeWeight(5);
+      // p.beginShape();
+      // p.vertex(this.smallSize / 2, -this.bigSize / 2) // Top Right
+      // p.vertex(-this.smallSize / 2, -this.bigSize / 2) // Top Left
+      // p.vertex(-this.smallSize / 2, -this.smallSize / 2) // Top left corner
+      // p.vertex(-this.bigSize / 2, -this.smallSize / 2) // Left top
+      // p.vertex(-this.bigSize / 2, this.smallSize / 2) // Left bot
+      // p.vertex(-this.smallSize / 2, this.smallSize / 2) // Bot left corner
+      // p.vertex(-this.smallSize / 2, this.bigSize / 2) // Bot Left
+      // p.vertex(this.smallSize / 2, this.bigSize / 2) // Bot Left
+      // p.vertex(this.smallSize / 2, this.smallSize / 2) // Bot right corner
+      // p.vertex(this.bigSize / 2, this.smallSize / 2) // Right bot
+      // p.vertex(this.bigSize / 2, -this.smallSize / 2) // Right top
+      // p.vertex(this.smallSize / 2, -this.smallSize / 2) // Top right corner
+      // p.endShape(CLOSE);
+      // p.pop();
     }
 
     // Cross 0: Flashing crosses
@@ -324,13 +328,17 @@ let pharmacySketch = function (p) {
       //console.log (this.celsius.toFixed(2));
 
       p.push();
-      p.fill(0, 255, 0);
+      if (lightMode == 1) {
+        p.fill(0, 255, 0);
+      } else {
+        p.fill(0);
+      }
       p.rect(this.x, this.y, this.bigSize, this.bigSize);
       p.stroke(255, 255, 255);
       p.pop();
 
       p.push();
-      p.fill(255, 0, 0);
+      p.fill(this.pink);
       p.textAlign(CENTER, CENTER);
       p.text(this.celsius.toFixed(2) + " °C", this.x, this.y - 10);
       p.pop();
@@ -355,7 +363,7 @@ let pharmacySketch = function (p) {
 
     // Cross 6: Rotating snakes
     makeSnakes() {
-      this.makeFlashes(p.color(255, 0, 0));
+      this.makeFlashes(p.color(this.pink));
 
       //this.snakeLayer.background(0);
       this.snakeLayer.angleMode(p.DEGREES);
@@ -377,7 +385,7 @@ let pharmacySketch = function (p) {
     // Cross 7: Farmacia Distel
     makeFarmacia() {
       this.farmLayer.background(0, 255, 0);
-      this.farmLayer.fill(255, 0, 0);
+      this.farmLayer.fill(this.pink);
       for (let x = this.xStart; x <= this.farmLayer.width + this.scrollSize; x += this.scrollSize) { //use a for loop to draw the line of text multiple times down the vertical axis
         this.farmLayer.text("Farmacia Distel", x, this.farmLayer.height / 2 + this.textSize / 2 - 10); //display text
       }
@@ -394,6 +402,8 @@ let pharmacySketch = function (p) {
     constructor(posX, posY, bigSize, smallSize, stroke) {
       this.x = posX;
       this.y = posY;
+      this.posX = posX;
+      this.posY = posY;
       this.bigSize = bigSize;
       this.smallSize = smallSize;
       this.scale = 1;
@@ -402,12 +412,17 @@ let pharmacySketch = function (p) {
     }
 
     draw(scale, transX, transY, colour) {
+      
       p.push();
       p.noFill();
       p.strokeWeight(this.stroke);
 
       this.color += colour;
-      p.stroke(this.color, 255, this.color);
+      if(this.x > this.posX - 100 || this.x < this.posX + 100 || this.y > this.posY - 100 || this.y < this.posY + 100) {
+        p.stroke(this.color, 255, this.color);
+      } else {
+        p.stroke(0, 0, 0, 0);
+      }
 
 
       p.translate(this.x, this.y);
@@ -430,6 +445,7 @@ let pharmacySketch = function (p) {
       p.vertex(this.smallSize / 2, -this.smallSize / 2) // Top right corner
       p.endShape(CLOSE);
       p.pop();
+      
 
       this.x = this.x + this.x * transX;
       this.y += transY;
