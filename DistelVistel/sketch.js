@@ -1,18 +1,18 @@
 // Global Vars
-const NUMOFSCENES = 7;
+const NUMOFSCENES = 9;
 const VERBOSE = false;
 const FRAMERATE = 60;
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
 
-let scene = 1;
+let scene = 10;
 let sceneChange = false;
 let createdCanvas = 0;
 let lightMode = 1; // Bepaalt of de achtergrond wit of zwart is
 
 let sceneDoms;
 let scenes;
-let sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6];
+let sceneAllocations = [0, 1, 2, 2, 2, 3, 4, 5, 6, 7, 8];
 
 // Global Waves Vars
 let wColorMode = 0; // 0 = kleur, 1 = monochroom
@@ -23,10 +23,11 @@ let wMovementCounter = 1;
 let wFrequencyAmplitude = [1, 1, 1];
 let wDistortionAmount;
 let wDistortionType = 0;
-let wCrossType = 7;
+let wCrossType = 5;
 let wShapeType = 0;
 let wMaterial = 0;
 let wTemp = 0;
+let manual = 0;
 
 function preload() {
   scenes = [ // set Scenes
@@ -36,7 +37,9 @@ function preload() {
     new p5(pharmacySketch),
     new p5(terrainSketch),
     new p5(vinylSketch),
-    new p5(shapeSketch)
+    new p5(shapeSketch),
+    new p5(distelLosSketch),
+    new p5(flowFieldSketch)
     // ,
     // new p5(ASCIISketch)
   ];
@@ -136,6 +139,9 @@ function oscReceiver(address, msg) {
       break;
     case "/crossRecursionX":
       crossRecursionX = msg;
+      break;
+    case "/manual":
+      manual = msg;
       break;
   }
 }

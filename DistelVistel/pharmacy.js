@@ -340,7 +340,7 @@ let pharmacySketch = function (p) {
     // Cross 5: Recursion
     makeRecursion() {
       this.counter += 1;
-      let xMovement = (wFrequency - 0.0025) * 10;
+      let xMovement = p.map(wFrequency, 0 , 0.005, -0.015 , 0.015);
       for (let i = 0; i < this.crossOutlines.length; i++) {
         this.crossOutlines[i].draw(-0.03, xMovement, 0, 7);
       }
