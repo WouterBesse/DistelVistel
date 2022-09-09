@@ -131,13 +131,13 @@ let flowFieldSketch = function (p) {
     class fireParticle extends Particle {
         constructor(x, y, hue) {
             super(x, y, hue);
-            this.velocityInfluence = 512;
+            this.velocityInfluence = 300;
             this.vel = p5.Vector.random2D();
             this.vel.mult(p.random(2, 10));
         }
 
         update() {
-            this.vel.mult(0.9);
+            this.vel.mult(0.92);
             this.lifespan -= 4;
             this.vel.add(this.acc);
             this.vel.limit(maxspeed);
@@ -148,12 +148,12 @@ let flowFieldSketch = function (p) {
         show(opacity) {
             p.colorMode(HSB);
 
-            
+
             p.strokeWeight(2);
             p.stroke(this.hue, 255, 255, opacity);
-            
 
-            p.circle(this.pos.x, this.pos.y, 4)
+
+            p.point(this.pos.x, this.pos.y)
             p.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
             this.updatePrev();
         }
@@ -171,16 +171,16 @@ let flowFieldSketch = function (p) {
             this.y = p.random(windowHeight);
             this.exploded = false;
             this.particles = [];
-            this.lifespan = 512;
+            this.lifespan = 800;
             this.doner = false;
         }
 
         done() {
             if (this.lifespan <= 0) {
                 for (let i = 0; i < this.particles.length; i++) {
-                    
+
                     this.particles.splice(i, 1);
-                    
+
                 }
                 this.doner = true;
             }
@@ -196,7 +196,7 @@ let flowFieldSketch = function (p) {
         }
 
         explode() {
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 50; i++) {
                 const p = new fireParticle(this.x, this.y, this.hue, false);
                 this.particles.push(p);
             }
@@ -204,7 +204,7 @@ let flowFieldSketch = function (p) {
 
         show() {
             for (var i = 0; i < this.particles.length; i++) {
-                this.particles[i].show(this.lifespan/2);
+                this.particles[i].show(this.lifespan / 2);
             }
         }
 
@@ -239,7 +239,7 @@ let flowFieldSketch = function (p) {
             if (particles.length < particleCount) {
                 p.addParticles(1);
             } else if (particles.length > particleCount) {
-                p.deleteParticles(1);
+                p.deleteParticles(particles.length - particleCount);
             }
 
             if (moveNoise) {

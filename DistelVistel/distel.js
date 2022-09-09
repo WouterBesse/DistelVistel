@@ -50,7 +50,7 @@ let distelSketch = function (p) {
 
   p.drawDistel = function (distel, distelX, distelY) {
     p.push();
-    p.translate(distelX, distelY);
+    p.translate(distelX, distelY, -300);
     switch (distel) {
       case distelModel:
         p.scale(2*((wFrequencyAmplitude[0] / 1024) * 2 / DISTELYINSTANCES));
@@ -82,7 +82,7 @@ let distelSketch = function (p) {
     p.angleMode(p.DEGREES);
     p.strokeWeight(1);
     p.rotateY(180);
-    p.scale(0.85);
+    p.scale(0.7);
     p.emissiveMaterial(255, 0, 146);
     p.drawDistels();
 

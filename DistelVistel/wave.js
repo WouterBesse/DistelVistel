@@ -38,7 +38,10 @@ let waveSketch = function (p) {
     var h = amplitude * p.sin(w * 0.03 + phase * 0.07 + line * p.TWO_PI / 3) * p.pow(p.abs(p.sin(w * wFrequency + phase * 0.02)), 5);
 
     // Dit is een array van 3 "distortion" formules om de waves nog cooler en meer responsive te maken
-    var waveTypes = [p.height / 2 + p.sin(wDistortionAmount * w) * wDistortionAmount * 100, p.height / 2 + p.sin(w * 0.0015 * p.TWO_PI * wDistortionAmount) * ((500 * wDistortionAmount) - 500), p.height / 2 * wDistortionAmount];
+    var waveTypes = [p.height / 2 + p.sin(wDistortionAmount * w) * wDistortionAmount * 100,
+    p.height / 2 + p.sin(w * 0.0015 * p.TWO_PI * wDistortionAmount) * ((500 * wDistortionAmount) - 500),
+    p.height / 2 * wDistortionAmount];
+    
     h += waveTypes[wDistortionType];
     p.curveVertex(w, h);
   }

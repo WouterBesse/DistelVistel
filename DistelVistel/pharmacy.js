@@ -1,5 +1,5 @@
 let pharmacySketch = function (p) {
-  const CROSSAMOUNT = 2;
+  const CROSSAMOUNT = 1;
   const CROSSSIZE = 800 / CROSSAMOUNT; // width/height of the cross in pixels
   let crossArray = [];
   let fontRegular;
