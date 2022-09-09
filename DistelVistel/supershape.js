@@ -40,7 +40,7 @@ let shapeSketch = function (p) {
 
     p.draw = function () {
         //console.log("amp: ", wFrequencyAmplitude[0]);
-        mult = p.map(wFrequencyAmplitude[0], 0, 1000, 0, 3);
+        mult = p.map(wFrequencyAmplitude[0], 0, 1000, 0, 2);
         //console.log("mult: ", mult);
         m1 = p.map(sin(p.millis() / 1000), -1, 1, 0, 5) + mult;
         m2 = p.map(sin(p.millis() / 3333), -1, 1, 0, 5);

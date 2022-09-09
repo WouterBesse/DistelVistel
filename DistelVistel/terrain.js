@@ -62,7 +62,7 @@ let terrainSketch = function (p) {
     // }
 
     for (var y = 0; y < rows; y++) {
-      var xoff = p.map(wFrequencyAmplitude[1], 0, 1, -0.01, 0.01);
+      var xoff = p.map(wFrequencyAmplitude[1], 0, 1, -0.003, 0.003);
       for (var x = 0; x < cols; x++) {
         terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -amplitude, amplitude);
         xoff += 0.2;

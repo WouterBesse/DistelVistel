@@ -53,7 +53,7 @@ let distelSketch = function (p) {
     p.translate(distelX, distelY, -300);
     switch (distel) {
       case distelModel:
-        p.scale(2*((wFrequencyAmplitude[0] / 1024) * 2 / DISTELYINSTANCES));
+        p.scale(p.map(wFrequencyAmplitude[0], 0, 1000, 0, 1.3));
         break;
       case distelRondModel:
         p.rotateZ(millis() / 15);
