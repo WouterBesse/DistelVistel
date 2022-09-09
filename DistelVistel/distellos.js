@@ -43,7 +43,7 @@ let distelLosSketch = function (p) {
 
     p.drawDistel = function (distel) {
         p.push();
-        p.scale(p.map(wFrequencyAmplitude[0], 0, 1000, 1.5, 4));
+        p.scale(p.map(wFrequencyAmplitude[0], 0, 1000, 1.5, 4.5));
         p.model(distel);
         p.pop();
     }

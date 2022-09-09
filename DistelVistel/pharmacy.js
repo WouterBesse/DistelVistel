@@ -137,7 +137,8 @@ let pharmacySketch = function (p) {
       this.textSize = this.bigSize / 5;
       this.farmLayer.textFont(fontRegular);
 
-      this.pink = color(255, 0, 146);
+      this.pink = color(136, 0, 255);
+      this.green = color(0, 255, 0);
     }
 
     // For all crosses
@@ -190,9 +191,9 @@ let pharmacySketch = function (p) {
 
     makeCrossMask() {
       this.maskLayer.background(0);
-      
+
       this.maskLayer.rectMode(p.CENTER);
-      
+
 
       this.maskLayer.erase();
       this.maskLayer.rect(this.maskSize / 2, this.maskSize / 2, this.bigSize, this.smallSize);
@@ -228,7 +229,7 @@ let pharmacySketch = function (p) {
     }
 
     // Cross 0: Flashing crosses
-    makeFlashes(color = p.color(0, 255, 0)) {
+    makeFlashes(color = p.color(this.green)) {
       this.counter += 1;
       p.push();
       if (this.counter % 10 < 5) {
@@ -248,7 +249,7 @@ let pharmacySketch = function (p) {
 
 
       this.lineLayer.push();
-      this.lineLayer.fill(0, 255, 0);
+      this.lineLayer.fill(this.green);
       this.lineLayer.noStroke();
       this.lineLayer.translate(this.bigSize / 2, this.bigSize / 2);
       this.lineLayer.rotate(this.lineRot += this.lineRotateSpeed);
@@ -268,7 +269,7 @@ let pharmacySketch = function (p) {
       this.lineLayer.background(0);
 
       this.lineLayer.push();
-      this.lineLayer.fill(0, 255, 0);
+      this.lineLayer.fill(this.green);
       this.lineLayer.noStroke();
 
       for (var s = 0; s < this.lineAmount; s = s + 1) {
@@ -311,7 +312,7 @@ let pharmacySketch = function (p) {
       this.circleLayer.background(0);
 
       this.circleLayer.push();
-      this.circleLayer.fill(0, 255, 0);
+      this.circleLayer.fill(this.green);
       this.circleLayer.noStroke();
 
       this.resetCircle();
@@ -329,7 +330,7 @@ let pharmacySketch = function (p) {
 
       p.push();
       if (lightMode == 1) {
-        p.fill(0, 255, 0);
+        p.fill(this.green);
       } else {
         p.fill(0);
       }
@@ -348,7 +349,7 @@ let pharmacySketch = function (p) {
     // Cross 5: Recursion
     makeRecursion() {
       this.counter += 1;
-      let xMovement = p.map(wFrequency, 0 , 0.005, -0.015 , 0.015);
+      let xMovement = p.map(wFrequency, 0, 0.005, -0.015, 0.015);
       for (let i = 0; i < this.crossOutlines.length; i++) {
         this.crossOutlines[i].draw(-0.03, xMovement, 0, 7);
       }
@@ -374,7 +375,7 @@ let pharmacySketch = function (p) {
 
       this.snakeLayer.clear();
       this.snakeLayer.stroke(255, 255, 255);
-      this.snakeLayer.fill(0, 255, 0);
+      this.snakeLayer.fill(this.green);
       this.snakeLayer.model(snakeModel);
 
 
@@ -384,7 +385,7 @@ let pharmacySketch = function (p) {
 
     // Cross 7: Farmacia Distel
     makeFarmacia() {
-      this.farmLayer.background(0, 255, 0);
+      this.farmLayer.background(this.green);
       this.farmLayer.fill(this.pink);
       for (let x = this.xStart; x <= this.farmLayer.width + this.scrollSize; x += this.scrollSize) { //use a for loop to draw the line of text multiple times down the vertical axis
         this.farmLayer.text("Farmacia Distel", x, this.farmLayer.height / 2 + this.textSize / 2 - 10); //display text
@@ -412,13 +413,13 @@ let pharmacySketch = function (p) {
     }
 
     draw(scale, transX, transY, colour) {
-      
+
       p.push();
       p.noFill();
       p.strokeWeight(this.stroke);
 
       this.color += colour;
-      if(this.x > this.posX * -2 || this.x < this.posX * 2 || this.y > this.posY * -2 || this.y < this.posY * 2) {
+      if (this.x > this.posX * -2 || this.x < this.posX * 2 || this.y > this.posY * -2 || this.y < this.posY * 2) {
         p.stroke(this.color, 255, this.color);
       } else {
         p.stroke(0, 0, 0, 0);
@@ -445,7 +446,7 @@ let pharmacySketch = function (p) {
       p.vertex(this.smallSize / 2, -this.smallSize / 2) // Top right corner
       p.endShape(CLOSE);
       p.pop();
-      
+
 
       this.x = this.x + this.x * transX;
       this.y += transY;
