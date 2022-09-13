@@ -214,13 +214,13 @@ let flowFieldSketch = function (p) {
     }
 
     p.draw = function () {
-        if (!lightMode && manual) {
+        if (!lightMode && !manual) {
             xMove = p.random();
             yMove = p.random();
             zMove = p.random();
         } else {
-            if (!lightMode && !manual) {
-                if (div == 10) {
+            if (!lightMode && manual) {
+                if (div == 15) {
                     xMove = p.random();
                     yMove = p.random();
                     zMove = p.random();
