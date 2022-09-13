@@ -243,7 +243,6 @@ let pharmacySketch = function (p) {
     }
 
     // Cross 1: Rotating lines
-
     makeRotateLines() {
       this.lineLayer.background(0);
 
