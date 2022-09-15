@@ -8,12 +8,14 @@ let flowFieldSketch = function (p) {
     let div = 0;
 
 
-    var scl = 0.005;    // scale of noisefield, [+/-] to zoom in/out
+    var scl = 0.0025;    // scale of noisefield, [+/-] to zoom in/out
 
     var moveNoise = true;       //[n] is movement in noise space on
     var moveParticles = true;   //[space] is particle movement on
 
-    var particleCount = 1000;   // max number of particles
+    var particleCount = 500;
+    const EXPLOSIONCOUNT = 50;
+    const EXPLOSIONFREQ = 0.07   // max number of particles
     // [right/left arrow] add/subtract 50
 
     var numberOfSlices = 10;     // number of slices in noise space (along z-axis)
@@ -30,7 +32,7 @@ let flowFieldSketch = function (p) {
     const zSpeed = 0.05;
 
     const sliceDistance = 0.005;    // distance between noise slices
-    const maxspeed = 6;     // maxspeed of particles, independent of framerate 
+    let maxspeed = 6;     // maxspeed of particles, independent of framerate 
     // (so higher framerate will make them go faster)
 
     const hueMultiplier = 500.0;    // particles will multiply noise result 
@@ -101,7 +103,7 @@ let flowFieldSketch = function (p) {
                 this.hue = force;
             }
             p.stroke(this.hue, 255, 255, visibility);
-            p.strokeWeight(3);
+            p.strokeWeight(30);
         };
 
         show() {
@@ -117,9 +119,12 @@ let flowFieldSketch = function (p) {
         edges() {
             if (this.pos.x > windowWidth || this.pos.x < 0 ||
                 this.pos.y > windowHeight || this.pos.y < 0) {
-                this.pos = p.createVector(random(windowWidth), random(windowHeight));
-                this.vel = p.createVector(0, 0);
-                this.updatePrev();
+                return true;
+                // this.pos = p.createVector(random(windowWidth), random(windowHeight));
+                // this.vel = p.createVector(0, 0);
+                //this.updatePrev();
+            } else {
+                return false;
             }
         };
 
@@ -133,12 +138,11 @@ let flowFieldSketch = function (p) {
             super(x, y, hue);
             this.velocityInfluence = 300;
             this.vel = p5.Vector.random2D();
-            this.vel.mult(p.random(2, 10));
+            this.vel.mult(p.random(10, 30));
         }
 
         update() {
             this.vel.mult(0.92);
-            this.lifespan -= 4;
             this.vel.add(this.acc);
             this.vel.limit(maxspeed);
             this.pos.add(this.vel);
@@ -149,7 +153,7 @@ let flowFieldSketch = function (p) {
             p.colorMode(HSB);
 
 
-            p.strokeWeight(2);
+            p.strokeWeight(30);
             p.stroke(this.hue, 255, 255, opacity);
 
 
@@ -171,7 +175,7 @@ let flowFieldSketch = function (p) {
             this.y = p.random(windowHeight);
             this.exploded = false;
             this.particles = [];
-            this.lifespan = 800;
+            this.lifespan = 2000;
             this.doner = false;
         }
 
@@ -196,7 +200,7 @@ let flowFieldSketch = function (p) {
         }
 
         explode() {
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < EXPLOSIONCOUNT; i++) {
                 const p = new fireParticle(this.x, this.y, this.hue, false);
                 this.particles.push(p);
             }
@@ -208,8 +212,12 @@ let flowFieldSketch = function (p) {
             }
         }
 
-        splicePart(k) {
-            particles.splice(k, 1);
+        get particleAmount() {
+            return particles.length;
+        }
+
+        set klaar(klaarheid) {
+            this.doner = klaarheid;
         }
     }
 
@@ -236,11 +244,7 @@ let flowFieldSketch = function (p) {
             timeLastFrame = p.millis();
 
             // add/delete particle, if there are not enough/too many
-            if (particles.length < particleCount) {
-                p.addParticles(1);
-            } else if (particles.length > particleCount) {
-                p.deleteParticles(particles.length - particleCount);
-            }
+            
 
             if (moveNoise) {
                 xMove += xSpeed * timePassed;
@@ -256,21 +260,37 @@ let flowFieldSketch = function (p) {
                 // will also set hue
                 particles[i].update();          // move particle
                 particles[i].show();            // draw particle
-                particles[i].edges();           // check if still in bounds
+                if (particles[i].edges()) {
+                    particles.splice(i, 1);
+                };           // check if still in bounds
             }
         }
 
-        if (p.random(1) < 0.04) {
+        if (p.random(1) < EXPLOSIONFREQ) {
             f = new Firework();
             f.explode();
             fireworks.push(f);
         }
 
+        let particleAmount = 0;
+
         for (let i = fireworks.length - 1; i >= 0; i--) {
             for (var k = 0; k < fireworks[i].particles.length; k++) {
                 fireworks[i].particles[k].calculateForce();  // calculate force from noise field
                 // will also set hue
-                fireworks[i].particles[k].edges();           // check if still in bounds
+                if (fireworks[i].particles[k].edges()) {
+                    fireworks[i].particles.splice(k, 1);
+                };           // check if still in bounds
+            }
+            
+            particleAmount += fireworks[i].particleAmount;
+
+            if (particleAmount > particleCount) {
+                p.deleteParticles(particleAmount - particleCount, particleAmount, i);
+            }
+
+            if (particleAmount <= 1) {
+                fireworks[i].klaarheid = true;
             }
 
             fireworks[i].update();
@@ -278,12 +298,10 @@ let flowFieldSketch = function (p) {
 
             if (fireworks[i].doner) {
                 for (var k = 0; k < fireworks[i].particles.length; k++) {
-                    fireworks[i].splicePart(k);
+                    fireworks[i].particles.splice(k, 1);
                 }
                 fireworks.splice(i, 1);
             }
-
-
         }
 
     }
@@ -298,10 +316,10 @@ let flowFieldSketch = function (p) {
             particles.unshift(new Particle());
         }
     }
-    p.deleteParticles = function (num) {
-        num = p.min(num, particles.length);
+    p.deleteParticles = function (num, numPar, k) {
+        num = p.min(num, numPar);
         for (var i = 0; i < num; i++) {
-            particles.pop();
+            fireworks[k].particles.pop();
         }
     }
     p.setParticles = function (num) {
