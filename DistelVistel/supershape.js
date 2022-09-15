@@ -1,4 +1,6 @@
 let shapeSketch = function (p) {
+    const black = color(0, 0, 0);
+    const white = color(255, 255, 255);
     var globe;
     var total = 40;
     var offset = 0;
@@ -38,6 +40,17 @@ let shapeSketch = function (p) {
         return r;
     }
 
+    p.drawBackground = function () {
+        p.blendMode(p.ADD);
+        if (lightMode) {
+          p.background(black);
+          p.stroke(white);
+        } else {
+          p.background(white);
+          p.stroke(black);
+        }
+      }
+
     p.draw = function () {
         //console.log("amp: ", wFrequencyAmplitude[0]);
         mult = p.map(wFrequencyAmplitude[0], 0, 1000, 0, 2);
@@ -51,7 +64,7 @@ let shapeSketch = function (p) {
         p.rotateY(millis() / 600);
         p.rotateX(millis() / 1100)
 
-        p.background(0);
+        p.drawBackground();
         p.scale(1 + mult / 3);
         var r = 200;
         for (var i = 0; i < total + 1; i++) {
@@ -75,7 +88,7 @@ let shapeSketch = function (p) {
                 p.normalMaterial();
                 break;
             case 1:
-                p.stroke(255);
+                //p.stroke(255);
                 p.noFill();
             //p.fill(200);
         }
