@@ -40,7 +40,7 @@ let waveSketch = function (p) {
     // Dit is een array van 3 "distortion" formules om de waves nog cooler en meer responsive te maken
     var waveTypes = [p.height / 2 + p.sin(wDistortionAmount * w) * wDistortionAmount * 100,
     p.height / 2 + p.sin(w * 0.0015 * p.TWO_PI * wDistortionAmount) * ((500 * wDistortionAmount) - 500),
-    p.height / 2 * wDistortionAmount];
+    p.height / 2 + wDistortionAmount * 50];
     
     h += waveTypes[wDistortionType];
     p.curveVertex(w, h);

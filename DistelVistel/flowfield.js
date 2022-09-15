@@ -7,8 +7,8 @@ let flowFieldSketch = function (p) {
     let gravity;
     let div = 0;
 
-
-    var scl = 0.0025;    // scale of noisefield, [+/-] to zoom in/out
+    
+    var scl = 0.0025 * (wFrequencyAmplitude[0]/100 + 1);    // scale of noisefield, [+/-] to zoom in/out
 
     var moveNoise = true;       //[n] is movement in noise space on
     var moveParticles = true;   //[space] is particle movement on
@@ -103,7 +103,7 @@ let flowFieldSketch = function (p) {
                 this.hue = force;
             }
             p.stroke(this.hue, 255, 255, visibility);
-            p.strokeWeight(30);
+            p.strokeWeight(10 * (wFrequencyAmplitude[0]/200 + 1) + 20);
         };
 
         show() {
@@ -153,7 +153,7 @@ let flowFieldSketch = function (p) {
             p.colorMode(HSB);
 
 
-            p.strokeWeight(30);
+            p.strokeWeight(5 * (wFrequencyAmplitude[0]/700 + 1) + 20);
             p.stroke(this.hue, 255, 255, opacity);
 
 
@@ -221,7 +221,28 @@ let flowFieldSketch = function (p) {
         }
     }
 
+    p.drawBackground = function () {
+        p.blendMode(p.BLEND);
+    
+        // Kiezen tussen witte of zwarte achtergrond
+        switch (lightMode) {
+          case 0:
+            p.background(255, 255, 255, deletionSpeed);
+            p.blendMode(p.EXCLUSION);
+            break;
+          case 1:
+            p.background(0, 0, 0, deletionSpeed);
+          //  p.blendMode(p.SCREEN);
+            break;
+        }
+      }
+
     p.draw = function () {
+       // p.blendMode(p.BLEND);
+        visibility = 60 - wBlurDarkMode/4;
+        console.log(wFrequencyAmplitude[0] / 100 + 1);
+        maxspeed = 6 + (wFrequencyAmplitude[0] / 100 + 1);
+
         if (!lightMode && !manual) {
             xMove = p.random();
             yMove = p.random();
@@ -240,6 +261,7 @@ let flowFieldSketch = function (p) {
         }
 
         if (moveParticles) {
+            scl = 0.0025;
             var timePassed = (p.millis() - timeLastFrame) / 1000.0;
             timeLastFrame = p.millis();
 
@@ -252,7 +274,9 @@ let flowFieldSketch = function (p) {
                 zMove += zSpeed * timePassed;
             }
 
-            p.background(0, 0, 0, deletionSpeed);
+            //p.background(0, 0, 0, deletionSpeed);
+            p.drawBackground();
+            //p.blendMode(p.DODGE);
 
             // loop through every particle
             for (var i = 0; i < particles.length; i++) {

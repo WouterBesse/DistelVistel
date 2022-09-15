@@ -289,6 +289,7 @@ let pharmacySketch = function (p) {
     resetCircle() {
       if (this.crossReset) {
         this.circleGrowth = this.circleAmount * this.circleMargin * -1;
+        console.log(this.crossReset);
       } else {
         this.circleGrowth += this.circleGrowSpeed;
       }
@@ -301,9 +302,7 @@ let pharmacySketch = function (p) {
           this.circleLayer.fill(0, 255 * (i % 2), 0);
           this.circleLayer.circle(this.bigSize / 2, this.bigSize / 2, diameter);
         }
-        if (diameter > this.smallSize * 0.1) {
-          this.crossReset = true;
-        }
+        
       }
     }
 
@@ -313,6 +312,10 @@ let pharmacySketch = function (p) {
       this.circleLayer.push();
       this.circleLayer.fill(this.green);
       this.circleLayer.noStroke();
+
+      if (this.circleGrowth > this.smallSize * 3) {
+        this.crossReset = true;
+      }
 
       this.resetCircle();
 
