@@ -1,7 +1,7 @@
 
 
 var v=0;
-var w=.005;
+var w=.01;
 
 if (jsarguments.length>1)
 	t = jsarguments[1];
