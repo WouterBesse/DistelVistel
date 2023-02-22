@@ -1,6 +1,6 @@
 var v=0;
 var s = 5;
-var f = 0.0005;
+var f = 0.05;
 var a = 6;
 
 
@@ -15,7 +15,7 @@ function bang()
 function msg_int(t)
 {
 	//post("received int " + v + "\n");
-	v = a/(Math.pow(Math.abs(s), s*Math.sin(f*t))+1)-a/2;
+	v = a/(Math.pow(Math.abs(s), s*Math.sin(f*t))+1);
 	bang();
 	
 }

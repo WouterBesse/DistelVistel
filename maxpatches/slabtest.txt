@@ -1,0 +1,3 @@
+gte_1 = in1 >= in2;
+gate_2 = gate(gte_1, in1, choices=1);
+out1 = gate_2;
