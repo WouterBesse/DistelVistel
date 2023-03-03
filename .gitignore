@@ -4,3 +4,4 @@ package-lock.json
 .filesToUpdate.txt
 .updateState.txt
 DistelVistel/.vscode/launch.json
+./Blender_Render
